@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>MARKET — NEON FORGE</title>
-<meta name="description" content="Маркет NEON FORGE: настоящие предметы CS2 с ценами и изображениями с площадки Steam.">
+<title>PROFILE — NEON FORGE</title>
+<meta name="description" content="Профиль оператора NEON FORGE: уровень кузницы, статистика запусков и телеметрия.">
 <meta name="theme-color" content="#07090D">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -51,7 +51,7 @@
       <a href="battles.html">BATTLES</a>
       <a href="contracts.html" data-soon>CONTRACTS</a>
       <a href="inventory.html">INVENTORY</a>
-      <a href="market.html" class="is-active">MARKET</a>
+      <a href="market.html">MARKET</a>
     </nav>
 
     <div class="hdr__right">
@@ -64,7 +64,7 @@
         <b id="balance">$0.00</b>
       </div>
       <button class="btn btn--key" data-deposit aria-label="Пополнить демо-баланс">DEPOSIT</button>
-      <a class="avatar" href="profile.html" title="Профиль оператора" aria-label="Профиль">QQ</a>
+      <a class="avatar is-active" href="profile.html" title="Профиль оператора" aria-label="Профиль">QQ</a>
       <button class="burger" id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
     </div>
   </div>
@@ -72,24 +72,60 @@
 
 <main>
 
-<section class="sec" id="market" style="padding-top:44px">
+<section class="sec" id="profile" style="padding-top:44px">
   <div class="wrap">
     <div class="market__head">
-      <div class="tag tag--cyan">ARSENAL / MARKET</div>
-      <h1>Маркет предметов</h1>
-      <p>Настоящие скины CS2: название, износ, класс редкости, цена и изображение — с витрины Steam Community Market. ACQUIRE забирает предмет на демо-баланс, клик по карточке ставит её целью ядра.</p>
+      <div class="tag tag--cyan">OPERATOR / PROFILE</div>
+      <h1>Профиль оператора</h1>
+      <p>Уровень кузницы, статистика запусков и телеметрия последних апгрейдов. Всё считается локально по вашим запускам ядра.</p>
     </div>
 
-    <div class="filters">
-      <input type="search" id="search" placeholder="поиск: AWP, Karambit, Redline…" aria-label="Поиск">
-      <select id="sort" aria-label="Сортировка">
-        <option value="asc">СНАЧАЛА ДЕШЁВЫЕ</option>
-        <option value="desc">СНАЧАЛА ДОРОГИЕ</option>
-        <option value="name">ПО НАЗВАНИЮ</option>
-      </select>
+    <div class="pf">
+      <aside class="pf__card">
+        <div class="pf__ava">QQ</div>
+        <div class="pf__nick">OPERATOR-01</div>
+        <div class="tag pf__id">ID · NF-2026-0001</div>
+
+        <div class="pf__lvl">
+          <div class="pf__lvlrow"><b>FORGE LVL <span id="pf-level">1</span></b><span id="pf-xp">0/4 XP</span></div>
+          <div class="lvl__bar"><i class="lvl__fill" id="pf-fill"></i></div>
+          <div class="pf__reactor" id="pf-reactor"></div>
+        </div>
+
+        <div class="pf__acts">
+          <button class="btn btn--key" data-deposit>DEPOSIT</button>
+          <a class="btn" href="index.html#forge">К ЯДРУ</a>
+          <a class="btn" href="inventory.html">ХРАНИЛИЩЕ</a>
+        </div>
+      </aside>
+
+      <div>
+        <div class="stats">
+          <div class="stat"><div class="tag">BALANCE</div><b id="pf-balance">$0.00</b></div>
+          <div class="stat cyan"><div class="tag">RUNS</div><b id="pf-runs">0</b></div>
+          <div class="stat lime"><div class="tag">FORGED</div><b id="pf-wins">0</b></div>
+          <div class="stat"><div class="tag">SUCCESS RATE</div><b id="pf-rate">—</b></div>
+          <div class="stat"><div class="tag">STORAGE</div><b id="pf-items">0</b></div>
+          <div class="stat lime"><div class="tag">STORAGE VALUE</div><b id="pf-value">$0.00</b></div>
+        </div>
+
+        <div class="stat" style="margin-bottom:22px">
+          <div class="tag">BEST FORGE</div>
+          <b id="pf-best" style="font-size:18px">нет данных</b>
+          <div class="tag tag--lime" style="margin-top:8px" id="pf-best-p">—</div>
+        </div>
+
+        <div class="sec__head" style="margin-bottom:16px">
+          <div><div class="tag tag--cyan">TELEMETRY</div><h2 style="margin-top:10px">Recent Upgrades</h2></div>
+        </div>
+        <div class="rail" id="recent"></div>
+
+        <aside class="live" style="margin-top:20px">
+          <div class="live__hd"><span class="live__dot"></span><span class="tag tag--lime">LIVE ACTIVITY</span></div>
+          <div class="live__list" id="live-list"></div>
+        </aside>
+      </div>
     </div>
-    <div class="chips" id="chips"></div>
-    <div class="grid" id="shop-grid"></div>
 
     <a class="back" href="index.html#forge">← ВЕРНУТЬСЯ К ЯДРУ</a>
   </div>

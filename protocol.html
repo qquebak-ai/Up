@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>MARKET — NEON FORGE</title>
-<meta name="description" content="Маркет NEON FORGE: настоящие предметы CS2 с ценами и изображениями с площадки Steam.">
+<title>PROTOCOL — NEON FORGE</title>
+<meta name="description" content="Механика NEON FORGE: формула шанса, фазы запуска и честность расчёта.">
 <meta name="theme-color" content="#07090D">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -51,7 +51,7 @@
       <a href="battles.html">BATTLES</a>
       <a href="contracts.html" data-soon>CONTRACTS</a>
       <a href="inventory.html">INVENTORY</a>
-      <a href="market.html" class="is-active">MARKET</a>
+      <a href="market.html">MARKET</a>
     </nav>
 
     <div class="hdr__right">
@@ -72,24 +72,27 @@
 
 <main>
 
-<section class="sec" id="market" style="padding-top:44px">
+<section class="sec" id="protocol" style="padding-top:44px">
   <div class="wrap">
     <div class="market__head">
-      <div class="tag tag--cyan">ARSENAL / MARKET</div>
-      <h1>Маркет предметов</h1>
-      <p>Настоящие скины CS2: название, износ, класс редкости, цена и изображение — с витрины Steam Community Market. ACQUIRE забирает предмет на демо-баланс, клик по карточке ставит её целью ядра.</p>
+      <div class="tag tag--cyan">FAIRNESS / PROTOCOL</div>
+      <h1>Как считает ядро</h1>
+      <p>Полная механика запуска: что происходит с предметом, как считается шанс и почему механика убыточна на дистанции.</p>
     </div>
 
-    <div class="filters">
-      <input type="search" id="search" placeholder="поиск: AWP, Karambit, Redline…" aria-label="Поиск">
-      <select id="sort" aria-label="Сортировка">
-        <option value="asc">СНАЧАЛА ДЕШЁВЫЕ</option>
-        <option value="desc">СНАЧАЛА ДОРОГИЕ</option>
-        <option value="name">ПО НАЗВАНИЮ</option>
-      </select>
+    <div class="proto">
+      <div class="proto__b"><div class="tag tag--cyan">STEP 01</div><h3>Загрузка</h3><p>Предмет из хранилища отправляется в приёмник A. Его цена — ставка запуска.</p></div>
+      <div class="proto__b"><div class="tag tag--cyan">STEP 02</div><h3>Цель</h3><p>Пресет шанса подбирает предмет нужной цены, либо цель выбирается вручную в маркете.</p></div>
+      <div class="proto__b"><div class="tag tag--cyan">STEP 03</div><h3>Запуск</h3><p>Ядро проходит фазы SCANNING → CALCULATING → FORGING → RESONANCE и фиксирует результат.</p></div>
+      <div class="proto__b"><div class="tag tag--cyan">STEP 04</div><h3>Исход</h3><p>Успех — предмет собирается в приёмнике B. Провал — ядро схлопывается, ставка сгорает.</p></div>
     </div>
-    <div class="chips" id="chips"></div>
-    <div class="grid" id="shop-grid"></div>
+
+    <div class="formula">
+      <div class="tag tag--lime">PROBABILITY FORMULA</div>
+      <code>chance = (цена входа / цена цели) × 0.92 · предел 1…92%</code>
+      <p>Комиссия площадки — 8%, она заложена в формулу открыто. Исход определяется псевдослучайным числом в момент запуска: ожидаемая отдача 92% означает, что механика убыточна на дистанции.</p>
+      <p>Баланс, хранилище и статистика живут только в localStorage вашего браузера. Реальных платежей, вывода и связи с аккаунтом Steam нет.</p>
+    </div>
 
     <a class="back" href="index.html#forge">← ВЕРНУТЬСЯ К ЯДРУ</a>
   </div>
