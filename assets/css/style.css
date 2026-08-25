@@ -158,20 +158,35 @@ h1,h2,h3,h4{margin:0;line-height:1.15;letter-spacing:-.02em}
   border:1px solid var(--line-2);border-radius:24px;
   padding:28px;box-shadow:var(--shadow);
 }
-.upgrader__grid{
-  display:grid;gap:24px;align-items:center;
-  grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);
-  grid-template-areas:
-    "wheel to"
-    "from  to";
+.upgrader__grid{display:flex;flex-direction:column;align-items:center;gap:22px}
+
+/* пресеты желаемого шанса — между барабаном и предметами */
+.chances{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.chances button{
+  display:grid;gap:1px;min-width:104px;cursor:pointer;
+  border:1px solid var(--line-2);background:rgba(255,255,255,.04);
+  border-radius:13px;padding:11px 20px;transition:.16s;
 }
-.wheel{grid-area:wheel;justify-self:center}
-#slot-from{grid-area:from}
-#slot-to{grid-area:to;align-self:stretch}
+.chances button b{font-size:19px;font-weight:800;color:var(--txt)}
+.chances button span{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+.chances button:hover{border-color:var(--violet);background:rgba(123,92,250,.1)}
+.chances button.is-on{background:rgba(46,230,168,.14);border-color:var(--green)}
+.chances button.is-on b{color:var(--green)}
+
+/* предметы в одну строку: ваш слева, полученный справа */
+.slots{
+  display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  gap:16px;align-items:stretch;width:100%;
+}
+.slots__arrow{display:grid;place-items:center;color:var(--violet-2)}
+.slots__arrow svg{
+  width:30px;height:30px;fill:none;stroke:currentColor;
+  stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;
+}
 
 .slot{
   background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
-  padding:16px;min-height:300px;display:flex;flex-direction:column;gap:12px;
+  padding:16px;min-height:250px;display:flex;flex-direction:column;gap:12px;
   transition:.2s border-color,.2s box-shadow;
 }
 .slot.is-filled{border-color:rgba(123,92,250,.45);box-shadow:0 0 0 1px rgba(123,92,250,.12) inset}
@@ -486,11 +501,11 @@ html.ptr-anim main,html.ptr-anim .footer{transition:transform .24s ease}
   .footer__in{grid-template-columns:1fr 1fr}
 }
 @media (max-width:900px){
-  .upgrader__grid{
-    grid-template-columns:1fr;justify-items:center;
-    grid-template-areas:"wheel" "from" "to";
-  }
-  .slot{width:100%;min-height:auto}
+  .slot{width:100%;min-height:auto;padding:12px}
+  .slots{gap:8px}
+  .slots__arrow svg{width:22px;height:22px}
+  .slot__label{font-size:11px}
+  .slot__empty{min-height:140px;font-size:13px}
   .picked .art{max-width:280px}
   .wheel{width:min(300px,86vw)}
   .wheel__chance{font-size:clamp(30px,10vw,40px)}
