@@ -4,8 +4,8 @@
 const HOUSE_EDGE = 0.92;   // возврат по шансу
 const MAX_CHANCE = 0.92;
 const MIN_CHANCE = 0.01;
-const START_BALANCE = 1000;
-const STORE_KEY = 'upgrader.demo.v1';
+const START_BALANCE = 10000;                 // 100.00 в демо-валюте (цены хранятся в центах)
+const STORE_KEY = 'upgrader.demo.v2';
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -13,6 +13,9 @@ const byId = id => ITEMS.find(i => i.id === id);
 const rnd = (a, b) => a + Math.random() * (b - a);
 const pick = arr => arr[Math.floor(Math.random() * arr.length)];
 const fmt = n => Math.round(n).toLocaleString('ru-RU');
+/* цены с площадки приходят в центах — храним их как есть, а показываем в долларах */
+const money = cents => '$' + (cents / 100).toLocaleString('en-US',
+  { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 /* ---------- состояние ---------- */
 let state = { balance: START_BALANCE, inv: [], uid: 1 };
@@ -60,9 +63,9 @@ function cardHTML(item, { action = '', uid = null, tag = true } = {}) {
     ${tag ? `<span class="card__tag">${r.name}</span>` : ''}
     ${itemArt(item)}
     <div class="card__name">${item.name}</div>
-    <div class="card__skin">${item.skin}</div>
+    <div class="card__skin">${item.skin}${item.wear ? `<span class="wear">${item.wear}</span>` : ''}</div>
     <div class="card__foot">
-      <span class="card__price">${fmt(item.price)} ⛁</span>
+      <span class="card__price">${money(item.price)}</span>
       ${action ? `<button class="card__btn" data-act="${action}">${action === 'buy' ? 'Купить' : 'Продать'}</button>` : ''}
     </div>
   </article>`;
@@ -73,15 +76,15 @@ function pickedHTML(item) {
   <div class="picked">
     ${itemArt(item)}
     <div class="picked__name">${item.name}</div>
-    <div class="picked__skin">${item.skin}</div>
-    <div class="picked__price">${fmt(item.price)} ⛁</div>
+    <div class="picked__skin">${item.skin}${item.wear ? `<span class="wear">${item.wear}</span>` : ''}</div>
+    <div class="picked__price">${money(item.price)}</div>
   </div>`;
 }
 
 /* ---------- баланс ---------- */
 function renderBalance() {
   const el = $('#balance');
-  el.textContent = fmt(state.balance);
+  el.textContent = money(state.balance);
   const box = el.closest('.balance');
   box.classList.remove('is-bump');
   void box.offsetWidth;
@@ -102,7 +105,7 @@ function shopList() {
   let list = ITEMS.filter(i => {
     if (shopFilter.rarity.size && !shopFilter.rarity.has(i.rarity)) return false;
     if (!q) return true;
-    return (`${i.name} ${i.skin} ${RARITY[i.rarity].name}`).toLowerCase().includes(q);
+    return (`${i.name} ${i.skin} ${i.wear || ''} ${RARITY[i.rarity].name}`).toLowerCase().includes(q);
   });
   if (shopFilter.sort === 'asc') list.sort((a, b) => a.price - b.price);
   if (shopFilter.sort === 'desc') list.sort((a, b) => b.price - a.price);
@@ -124,7 +127,7 @@ function renderInv() {
     ? state.inv.map(x => cardHTML(byId(x.id), { action: 'sell', uid: x.uid })).join('')
     : `<div class="empty">Инвентарь пуст — купите предмет в магазине, чтобы начать апгрейд.</div>`;
   $('#inv-count').textContent = state.inv.length;
-  $('#inv-sum').textContent = fmt(state.inv.reduce((s, x) => s + byId(x.id).price, 0));
+  $('#inv-sum').textContent = money(state.inv.reduce((s, x) => s + byId(x.id).price, 0));
 }
 
 /* ---------- шанс и барабан ---------- */
@@ -158,8 +161,8 @@ function renderUpgrader() {
   $('#chance').innerHTML = `${(c * 100).toFixed(2)}<i>%</i>`;
   $('#wheel-zone').style.strokeDasharray = `${(c * CIRC).toFixed(2)} ${CIRC.toFixed(2)}`;
 
-  $('#meta-bet').textContent = f ? `${fmt(f.price)} ⛁` : '—';
-  $('#meta-win').textContent = t ? `${fmt(t.price)} ⛁` : '—';
+  $('#meta-bet').textContent = f ? money(f.price) : '—';
+  $('#meta-win').textContent = t ? money(t.price) : '—';
 
   const go = $('#go');
   go.disabled = !(f && t) || spinning;
@@ -269,7 +272,7 @@ function closeResult(sell) {
       save();
       renderBalance();
       renderInv();
-      toast(`Продано за ${fmt(item.price)} ⛁`, 'ok');
+      toast(`Продано за ${money(item.price)}`, 'ok');
     }
   }
   pendingWin = null;
@@ -288,7 +291,7 @@ function openModal(mode) {
 
 function renderModal() {
   const q = $('#modal-search').value.trim().toLowerCase();
-  const match = i => !q || (`${i.name} ${i.skin}`).toLowerCase().includes(q);
+  const match = i => !q || (`${i.name} ${i.skin} ${i.wear || ''}`).toLowerCase().includes(q);
   let html;
 
   if (modalMode === 'from') {
@@ -381,7 +384,7 @@ function bind() {
         state.balance += item.price;
         if (sel.from === uid) sel.from = null;
         save(); renderBalance(); renderInv(); renderUpgrader();
-        toast(`Продано за ${fmt(item.price)} ⛁`, 'ok');
+        toast(`Продано за ${money(item.price)}`, 'ok');
       }
       return;
     }
@@ -432,7 +435,7 @@ function bind() {
   $('#topup').addEventListener('click', () => {
     state.balance += START_BALANCE;
     save(); renderBalance();
-    toast(`Начислено ${fmt(START_BALANCE)} демо-монет`, 'ok');
+    toast(`Начислено ${money(START_BALANCE)} демо-баланса`, 'ok');
   });
   $('#login').addEventListener('click', () =>
     toast('Демо-режим: авторизация Steam не подключена'));
@@ -444,7 +447,7 @@ function bind() {
     sel.from = null;
     state.balance += sum;
     save(); renderBalance(); renderInv(); renderUpgrader();
-    toast(`Инвентарь продан за ${fmt(sum)} ⛁`, 'ok');
+    toast(`Инвентарь продан за ${money(sum)}`, 'ok');
   });
 
   $('#burger').addEventListener('click', () => $('#nav').classList.toggle('is-open'));

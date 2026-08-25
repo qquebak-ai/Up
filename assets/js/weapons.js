@@ -40,8 +40,30 @@ const WEAPON_SHAPES = {
 
 let __artId = 0;
 
-/* Возвращает разметку карточки-«картинки» предмета */
-function itemArt(item, opts = {}) {
+/* Картинки предметов берутся из витрины торговой площадки Steam */
+const STEAM_CDN = 'https://community.fastly.steamstatic.com/economy/image/';
+const ART_SIZE = '360fx240f';
+
+const escAttr = v => String(v).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+
+/* Настоящая картинка, если известен токен; иначе — нарисованный силуэт */
+function itemArt(item) {
+  if (!item.icon) return itemArtSvg(item);
+  const alt = escAttr(`${item.name} | ${item.skin}`);
+  return `<img class="art" src="${STEAM_CDN}${item.icon}/${ART_SIZE}" alt="${alt}"
+    loading="lazy" decoding="async" referrerpolicy="no-referrer"
+    onerror="artFallback(this,'${escAttr(item.id)}')">`;
+}
+
+/* Если картинка не загрузилась — подставляем силуэт, карточка не «схлопывается» */
+function artFallback(img, id) {
+  const item = ITEMS.find(i => i.id === id);
+  if (item) img.outerHTML = itemArtSvg(item);
+  else img.remove();
+}
+
+/* Резервная отрисовка силуэтом */
+function itemArtSvg(item) {
   const rarity = RARITY[item.rarity];
   const gid = `g${++__artId}`;
   const shape = WEAPON_SHAPES[item.type] || WEAPON_SHAPES.rifle;
