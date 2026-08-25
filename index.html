@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UPGRADER — апгрейд скинов CS2 | Демо-режим</title>
+<meta name="description" content="Апгрейдер скинов CS2: выберите свой предмет, укажите желаемый и крутите барабан. Демонстрационный проект на виртуальной валюте.">
+<meta name="theme-color" content="#0a0c13">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>⚡</text></svg>">
+</head>
+<body>
+
+<div class="promo">
+  <span class="dot"></span>
+  Демо-проект: игра идёт на виртуальных монетах, реальные ставки и вывод отсутствуют · 18+
+</div>
+
+<header class="header">
+  <div class="wrap header__in">
+    <a class="logo" href="#">
+      <span class="logo__mark">UP</span>
+      <span class="logo__text">UPGRADER<em>.pro</em></span>
+    </a>
+
+    <nav class="nav" id="nav">
+      <a href="#upgrade" class="is-active">Апгрейд</a>
+      <a href="#shop">Магазин</a>
+      <a href="#inventory">Инвентарь</a>
+      <a href="#how">Как играть</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+
+    <div class="header__right">
+      <div class="balance" title="Баланс демо-счёта">
+        <svg viewBox="0 0 24 24" class="coin" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h5M9.5 14.5h5" fill="none" stroke="#0a0c13" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span id="balance">0</span>
+      </div>
+      <button class="btn btn--ghost" id="topup">Пополнить</button>
+      <button class="btn btn--primary" id="login">Войти через Steam</button>
+      <button class="burger" id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ================= UPGRADER ================= -->
+<section class="section section--hero" id="upgrade">
+  <div class="glow glow--a"></div>
+  <div class="glow glow--b"></div>
+
+  <div class="wrap">
+    <div class="hero__head">
+      <h1>Апгрейд скинов <span>CS2</span></h1>
+      <p>Обменяй недорогой предмет на дорогой. Чем выше множитель — тем меньше шанс. Всё честно и прозрачно.</p>
+      <ul class="stats">
+        <li><b id="stat-online">0</b><span>игроков онлайн</span></li>
+        <li><b id="stat-upg">0</b><span>апгрейдов за сутки</span></li>
+        <li><b>92<i>%</i></b><span>возврат по шансу</span></li>
+      </ul>
+    </div>
+
+    <div class="upgrader">
+      <div class="upgrader__grid">
+
+        <!-- Свой предмет -->
+        <div class="slot" id="slot-from">
+          <div class="slot__label">Ваш предмет</div>
+          <div class="slot__body" id="from-body">
+            <button class="slot__empty" data-open="from">
+              <span class="plus">+</span>
+              Выбрать из инвентаря
+            </button>
+          </div>
+          <button class="slot__action" data-open="from">Изменить</button>
+        </div>
+
+        <!-- Барабан -->
+        <div class="wheel">
+          <svg viewBox="0 0 240 240" class="wheel__svg" aria-hidden="true">
+            <circle class="wheel__track" cx="120" cy="120" r="100"/>
+            <circle class="wheel__zone" id="wheel-zone" cx="120" cy="120" r="100"/>
+            <g class="wheel__needle" id="wheel-needle">
+              <line x1="120" y1="120" x2="214" y2="120"/>
+              <circle cx="214" cy="120" r="6"/>
+            </g>
+            <circle class="wheel__hub" cx="120" cy="120" r="62"/>
+          </svg>
+          <div class="wheel__center">
+            <div class="wheel__chance" id="chance">0.00<i>%</i></div>
+            <div class="wheel__hint" id="wheel-hint">шанс апгрейда</div>
+          </div>
+        </div>
+
+        <!-- Желаемый предмет -->
+        <div class="slot" id="slot-to">
+          <div class="slot__label">Желаемый предмет</div>
+          <div class="slot__body" id="to-body">
+            <button class="slot__empty" data-open="to">
+              <span class="plus">+</span>
+              Выбрать из магазина
+            </button>
+          </div>
+          <button class="slot__action" data-open="to">Изменить</button>
+        </div>
+      </div>
+
+      <div class="upgrader__controls">
+        <div class="mults" id="mults"></div>
+        <button class="btn btn--go" id="go" disabled>Выберите предметы</button>
+        <div class="upgrader__meta">
+          <span>Ставка: <b id="meta-bet">—</b></span>
+          <span>Выигрыш: <b id="meta-win">—</b></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Лента -->
+    <div class="feed">
+      <div class="feed__head">
+        <span class="live"><i></i>Live</span> последние апгрейды
+      </div>
+      <div class="feed__row" id="feed"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= МАГАЗИН ================= -->
+<section class="section" id="shop">
+  <div class="wrap">
+    <div class="section__head">
+      <h2>Магазин предметов</h2>
+      <div class="filters">
+        <input type="search" id="search" placeholder="Поиск: AWP, нож, Азимов…" aria-label="Поиск">
+        <select id="sort" aria-label="Сортировка">
+          <option value="asc">Сначала дешёвые</option>
+          <option value="desc">Сначала дорогие</option>
+          <option value="name">По названию</option>
+        </select>
+      </div>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="grid" id="shop-grid"></div>
+  </div>
+</section>
+
+<!-- ================= ИНВЕНТАРЬ ================= -->
+<section class="section section--alt" id="inventory">
+  <div class="wrap">
+    <div class="section__head">
+      <h2>Мой инвентарь <span class="count" id="inv-count">0</span></h2>
+      <div class="section__head-right">
+        <span class="inv-sum">Оценка: <b id="inv-sum">0</b></span>
+        <button class="btn btn--ghost" id="sell-all">Продать всё</button>
+      </div>
+    </div>
+    <div class="grid" id="inv-grid"></div>
+  </div>
+</section>
+
+<!-- ================= КАК ИГРАТЬ ================= -->
+<section class="section" id="how">
+  <div class="wrap">
+    <div class="section__head"><h2>Как это работает</h2></div>
+    <div class="steps">
+      <article class="step">
+        <div class="step__n">01</div>
+        <h3>Выберите свой предмет</h3>
+        <p>Возьмите скин из инвентаря или пополните демо-баланс и купите новый в магазине.</p>
+      </article>
+      <article class="step">
+        <div class="step__n">02</div>
+        <h3>Укажите цель</h3>
+        <p>Выберите желаемый скин или задайте множитель — от ×1.5 до ×20. Шанс пересчитывается сразу.</p>
+      </article>
+      <article class="step">
+        <div class="step__n">03</div>
+        <h3>Крутите барабан</h3>
+        <p>Стрелка останавливается в зелёной зоне — предмет ваш. Иначе ставка сгорает.</p>
+      </article>
+      <article class="step">
+        <div class="step__n">04</div>
+        <h3>Забирайте результат</h3>
+        <p>Выигранный скин попадает в инвентарь: используйте его в следующем апгрейде или продайте.</p>
+      </article>
+    </div>
+
+    <div class="fair">
+      <h3>Формула шанса</h3>
+      <p>Шанс рассчитывается как отношение стоимости вашего предмета к стоимости желаемого с учётом комиссии площадки:</p>
+      <code>шанс = (цена вашего предмета / цена желаемого) × 0.92</code>
+      <p class="fair__note">Максимальный шанс ограничен 92%, минимальный — 1%. Результат определяется псевдослучайным числом в момент запуска барабана.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section class="section section--alt" id="faq">
+  <div class="wrap wrap--narrow">
+    <div class="section__head"><h2>Частые вопросы</h2></div>
+    <div class="faq" id="faq-list">
+      <details open>
+        <summary>Здесь можно выиграть настоящие деньги?</summary>
+        <p>Нет. Это демонстрационный проект: баланс, предметы и цены — виртуальные, они хранятся только в вашем браузере. Ни пополнения, ни вывода не существует.</p>
+      </details>
+      <details>
+        <summary>Почему шанс меньше, чем отношение цен?</summary>
+        <p>Из шанса вычитается комиссия площадки — 8%. Это стандартная механика подобных сервисов, и она заложена в формулу открыто.</p>
+      </details>
+      <details>
+        <summary>Что будет с предметом при проигрыше?</summary>
+        <p>Он списывается из инвентаря. При выигрыше вместо него появляется выбранный скин.</p>
+      </details>
+      <details>
+        <summary>Как сбросить прогресс?</summary>
+        <p>Нажмите «Пополнить» — баланс вернётся к стартовому значению. Полный сброс — очистка данных сайта в браузере.</p>
+      </details>
+      <details>
+        <summary>Игра затягивает — что делать?</summary>
+        <p>Помните, что механика апгрейда математически убыточна: ожидаемая отдача 92%. Делайте перерывы, а при реальных проблемах с азартными играми обратитесь за помощью к специалистам.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap footer__in">
+    <div class="footer__col">
+      <a class="logo" href="#">
+        <span class="logo__mark">UP</span>
+        <span class="logo__text">UPGRADER<em>.pro</em></span>
+      </a>
+      <p>Учебный клон интерфейса апгрейдера скинов. Проект не связан с Valve Corporation и не является азартной игрой на деньги.</p>
+    </div>
+    <div class="footer__col">
+      <h4>Разделы</h4>
+      <a href="#upgrade">Апгрейд</a>
+      <a href="#shop">Магазин</a>
+      <a href="#inventory">Инвентарь</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div class="footer__col">
+      <h4>Документы</h4>
+      <a href="#faq">Пользовательское соглашение</a>
+      <a href="#faq">Политика конфиденциальности</a>
+      <a href="#how">Честная игра</a>
+    </div>
+    <div class="footer__col">
+      <h4>Ответственная игра</h4>
+      <p>Сервис доступен только совершеннолетним. Играйте с умом и не пытайтесь отыграться.</p>
+      <span class="age">18+</span>
+    </div>
+  </div>
+  <div class="wrap footer__bottom">
+    <span>© <span id="year"></span> UPGRADER — демонстрационный проект</span>
+    <span>Counter-Strike и скины — торговые марки Valve Corporation</span>
+  </div>
+</footer>
+
+<!-- ================= МОДАЛКА ВЫБОРА ================= -->
+<div class="modal" id="modal" hidden>
+  <div class="modal__backdrop" data-close></div>
+  <div class="modal__box" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal__head">
+      <h3 id="modal-title">Выбор предмета</h3>
+      <button class="modal__close" data-close aria-label="Закрыть">×</button>
+    </div>
+    <input type="search" class="modal__search" id="modal-search" placeholder="Поиск предмета…">
+    <div class="grid grid--modal" id="modal-grid"></div>
+    <p class="modal__empty" id="modal-empty" hidden>Ничего не найдено.</p>
+  </div>
+</div>
+
+<!-- ================= РЕЗУЛЬТАТ ================= -->
+<div class="result" id="result" hidden>
+  <div class="result__box">
+    <div class="result__title" id="result-title"></div>
+    <div class="result__card" id="result-card"></div>
+    <div class="result__actions">
+      <button class="btn btn--ghost" id="result-sell">Продать</button>
+      <button class="btn btn--primary" id="result-keep">В инвентарь</button>
+    </div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/weapons.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
