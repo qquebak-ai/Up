@@ -8,10 +8,10 @@ const START_BALANCE = 10000;      // 100.00 (цены хранятся в цен
 const STORE_KEY = 'neonforge.demo.v3';
 
 const PHASES = [
-  { id: 'scanning',    ms: 800,  state: 'SCANNING' },
-  { id: 'calculating', ms: 800,  state: 'CALCULATING' },
-  { id: 'forging',     ms: 1500, state: 'FORGING' },
-  { id: 'resonance',   ms: 1000, state: 'RESONANCE' },
+  { id: 'scanning',    ms: 800,  state: 'проверка' },
+  { id: 'calculating', ms: 800,  state: 'расчёт' },
+  { id: 'forging',     ms: 1500, state: 'запуск' },
+  { id: 'resonance',   ms: 1000, state: 'финиш' },
 ];
 const SPIN_MS = PHASES[2].ms + PHASES[3].ms;
 
@@ -81,10 +81,10 @@ function cardHTML(item, { action = '', uid = null } = {}) {
     ${itemArt(item)}
     <div class="card__n">${item.name}</div>
     <div class="card__meta"><em>${item.skin}</em>${item.wear ? `<span class="wear">${item.wear}</span>` : ''}</div>
-    <div class="card__inspect"><span>INSPECT</span><span>${item.type.toUpperCase()}</span></div>
+    <div class="card__inspect"><span>Осмотреть</span><span>${item.type}</span></div>
     <div class="card__foot">
       <span class="card__p">${money(item.price)}</span>
-      ${action ? `<button class="card__act" data-act="${action}">${action === 'buy' ? 'ACQUIRE' : 'SELL'}</button>` : ''}
+      ${action ? `<button class="card__act" data-act="${action}">${action === 'buy' ? 'Купить' : 'Продать'}</button>` : ''}
     </div>
   </article>`;
 }
@@ -101,7 +101,7 @@ function unitHTML(item) {
 
 const emptyBay = side => `
   <button class="bay__pick" data-open="${side}">
-    <i>+</i>${side === 'from' ? 'LOAD ITEM' : 'SET TARGET'}
+    <i>+</i>${side === 'from' ? 'Выбрать предмет' : 'Выбрать цель'}
   </button>`;
 
 /* ---------- баланс и уровень кузницы ---------- */
@@ -166,7 +166,7 @@ function renderInv() {
   if (!grid) return;
   grid.innerHTML = state.inv.length
     ? state.inv.map(x => cardHTML(byId(x.id), { action: 'sell', uid: x.uid })).join('')
-    : '<div class="empty">STORAGE EMPTY — ПРИОБРЕТИТЕ ПРЕДМЕТ В МАРКЕТЕ</div>';
+    : '<div class="empty">Инвентарь пуст — купите предмет в маркете</div>';
   $('#inv-count').textContent = state.inv.length;
   $('#inv-sum').textContent = money(state.inv.reduce((s, x) => s + byId(x.id).price, 0));
 }
@@ -226,9 +226,9 @@ function renderForge() {
 
   const btn = $('#forge-btn');
   btn.disabled = !(f && t) || running;
-  $('#forge-sub').textContent = running ? 'CORE ACTIVE'
-    : !f ? 'LOAD AN ITEM TO BEGIN'
-    : !t ? 'SET A TARGET'
+  $('#forge-sub').textContent = running ? 'Идёт прокачка…'
+    : !f ? 'Выберите предмет'
+    : !t ? 'Выберите цель'
     : `×${(t.price / f.price).toFixed(2)} · ${money(f.price)} → ${money(t.price)}`;
 
   $$('#presets button').forEach(b =>
@@ -238,13 +238,13 @@ function renderForge() {
 function renderPresets() {
   const box = $('#presets');
   if (!box) return;
-  box.innerHTML = CHANCES.map(c => `<button data-c="${c}"><b>${c}%</b><span>TARGET</span></button>`).join('');
+  box.innerHTML = CHANCES.map(c => `<button data-c="${c}"><b>${c}%</b><span>шанс</span></button>`).join('');
 }
 
 /* подобрать цель под желаемый шанс */
 function applyPreset(pct) {
   const f = fromItem();
-  if (!f) { toast('Сначала загрузите предмет в приёмник A', 'err'); return; }
+  if (!f) { toast('Сначала выберите свой предмет', 'err'); return; }
   const want = pct / 100;
   const err = i => Math.abs(Math.min(MAX_CHANCE, f.price * HOUSE_EDGE / i.price) - want);
   const best = ITEMS.filter(i => i.price > f.price)
@@ -314,18 +314,6 @@ function coreParticles() {
 let particles = { run() {}, burst() {}, calm() {} };
 
 /* ---------- запуск ядра ---------- */
-function setPhase(id) {
-  $$('#phases li').forEach(li => {
-    const idx = PHASES.findIndex(p => p.id === li.dataset.p);
-    const cur = PHASES.findIndex(p => p.id === id);
-    li.classList.toggle('is-now', li.dataset.p === id);
-    li.classList.toggle('is-done', cur >= 0 && idx >= 0 && idx < cur);
-  });
-}
-function clearPhases() {
-  $$('#phases li').forEach(li => li.classList.remove('is-now', 'is-done'));
-}
-
 function forge() {
   const f = fromItem(), t = toItem();
   if (!f || !t || running) return;
@@ -345,7 +333,6 @@ function forge() {
   let t0 = 0;
   PHASES.forEach(ph => {
     setTimeout(() => {
-      setPhase(ph.id);
       $('#core-state').textContent = ph.state;
       if (ph.id === 'forging') {
         const m = $('#core-marker');
@@ -377,17 +364,15 @@ function settle(win, f, t, core) {
 
   core.classList.remove('is-run');
   core.classList.add(win ? 'is-win' : 'is-fail');
-  $('#core-state').textContent = win ? 'FORGED' : 'COLLAPSED';
-  setPhase('result');
+  $('#core-state').textContent = win ? 'успех' : 'мимо';
   win ? particles.burst() : particles.calm();
 
-  pushRecent({ who: 'YOU', from: f, to: t, win });
+  pushRecent({ who: 'Вы', from: f, to: t, win });
   showResult(win, win ? t : f, wonUid);
 
   sel.from = null;
   running = false;
   renderBalance(); renderLevel(); renderInv(); renderProfile(); renderForge();
-  setTimeout(clearPhases, 2600);
 }
 
 /* ---------- окно результата ---------- */
@@ -397,11 +382,11 @@ function showResult(win, item, uid) {
   pendingWin = win ? uid : null;
   const box = $('#result');
   box.className = `result ${win ? 'win' : 'fail'}`;
-  $('#result-st').textContent = win ? 'CORE OUTPUT' : 'CORE COLLAPSED';
-  $('#result-title').textContent = win ? `${item.name} | ${item.skin}` : 'Резонанс не удержан';
+  $('#result-st').textContent = win ? 'Прокачка удалась' : 'Не в этот раз';
+  $('#result-title').textContent = win ? `${item.name} | ${item.skin}` : 'Предмет сгорел';
   $('#result-card').innerHTML = unitHTML(item);
   $('#result-sell').hidden = !win;
-  $('#result-keep').textContent = win ? 'TO STORAGE' : 'CONTINUE';
+  $('#result-keep').textContent = win ? 'В инвентарь' : 'Продолжить';
   box.hidden = false;
 }
 
@@ -424,7 +409,7 @@ function closeResult(sell) {
 function openModal(mode) {
   if (!$('#modal')) return;
   modalMode = mode;
-  $('#modal-title').textContent = mode === 'from' ? 'INPUT / ИНВЕНТАРЬ' : 'TARGET / КАТАЛОГ';
+  $('#modal-title').textContent = mode === 'from' ? 'Ваш инвентарь' : 'Каталог предметов';
   $('#modal-search').value = '';
   renderModal();
   $('#modal').hidden = false;
@@ -437,11 +422,11 @@ function renderModal() {
   if (modalMode === 'from') {
     list = state.inv.filter(x => match(byId(x.id)));
     html = list.map(x => cardHTML(byId(x.id), { uid: x.uid })).join('');
-    $('#modal-empty').textContent = state.inv.length ? 'NOTHING FOUND' : 'STORAGE EMPTY';
+    $('#modal-empty').textContent = state.inv.length ? 'Ничего не найдено' : 'Инвентарь пуст';
   } else {
     list = ITEMS.filter(match).sort((a, b) => a.price - b.price);
     html = list.map(i => cardHTML(i)).join('');
-    $('#modal-empty').textContent = 'NOTHING FOUND';
+    $('#modal-empty').textContent = 'Ничего не найдено';
   }
   $('#modal-empty').hidden = list.length > 0;
   $('#modal-grid').innerHTML = html;
@@ -460,7 +445,7 @@ function pushRecent({ who, from, to, win }) {
         <span class="rec__x">×${(to.price / from.price).toFixed(2)}</span>
       </div>
       <div class="rec__line">${from.name} → ${to.name} | ${to.skin}</div>
-      <div class="tag rec__st">${win ? 'FORGED' : 'COLLAPSED'} · ${money(to.price)}</div>`;
+      <div class="tag rec__st">${win ? 'успех' : 'мимо'} · ${money(to.price)}</div>`;
     rail.prepend(el);
     while (rail.children.length > 20) rail.lastElementChild.remove();
   }
@@ -473,7 +458,7 @@ function pushLive({ who, to, win }) {
   const el = document.createElement('div');
   el.className = `live__row ${win ? 'win' : 'fail'}`;
   const time = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-  el.innerHTML = `<b>${who}</b><span>${win ? 'выковал' : 'потерял'} ${to.name} | ${to.skin}</span><i>${time}</i>`;
+  el.innerHTML = `<b>${who}</b><span>${win ? 'выбил' : 'потерял'} ${to.name} | ${to.skin}</span><i>${time}</i>`;
   list.prepend(el);
   while (list.children.length > 26) list.lastElementChild.remove();
 }
@@ -509,7 +494,7 @@ function renderShop() {
   if (shopFilter.sort === 'name') list.sort((a, b) => a.name.localeCompare(b.name, 'ru'));
   grid.innerHTML = list.length
     ? list.map(i => cardHTML(i, { action: 'buy' })).join('')
-    : '<div class="empty">NOTHING FOUND</div>';
+    : '<div class="empty">Ничего не найдено</div>';
 }
 
 /* ---------- события ---------- */
@@ -535,7 +520,7 @@ function bind() {
         state.balance -= item.price;
         state.inv.push({ uid: state.uid++, id: item.id });
         save(); renderBalance(); renderInv(); renderProfile();
-        toast(`${item.name} | ${item.skin} — в хранилище`, 'ok');
+        toast(`${item.name} | ${item.skin} — в инвентаре`, 'ok');
       } else {
         const uid = Number(card.dataset.uid);
         state.inv = state.inv.filter(x => x.uid !== uid);
@@ -555,7 +540,7 @@ function bind() {
       const item = byId(sel.to);
       if ($('#forge')) { renderForge(); $('#forge').scrollIntoView({ behavior: 'smooth' }); }
       else {
-        toast(`${item.name} | ${item.skin} — цель ядра`, 'ok');
+        toast(`${item.name} | ${item.skin} — цель прокачки`, 'ok');
         setTimeout(() => { location.href = 'index.html#forge'; }, 450);
       }
       return;
@@ -600,11 +585,11 @@ function bind() {
 
 
   on('#sell-all', 'click', () => {
-    if (!state.inv.length) { toast('Хранилище пусто', 'err'); return; }
+    if (!state.inv.length) { toast('Инвентарь пуст', 'err'); return; }
     const sum = state.inv.reduce((s, x) => s + byId(x.id).price, 0);
     state.inv = []; sel.from = null; state.balance += sum;
     save(); renderBalance(); renderInv(); renderProfile(); renderForge();
-    toast(`Хранилище продано за ${money(sum)}`, 'ok');
+    toast(`Инвентарь продан за ${money(sum)}`, 'ok');
   });
 
   document.addEventListener('keydown', e => {
