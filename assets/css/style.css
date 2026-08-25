@@ -393,6 +393,31 @@ h1,h2,h3,h4{margin:0;line-height:1.15;letter-spacing:-.02em}
 .result__actions{display:flex;gap:10px}
 .result__actions .btn{flex:1}
 
+/* ============ обновление потягиванием ============ */
+/* содержимое страницы уезжает вниз, кружок появляется в открывшемся зазоре */
+.promo,.header,main,.footer{transform:translateY(var(--ptr,0px))}
+html.ptr-anim .promo,html.ptr-anim .header,
+html.ptr-anim main,html.ptr-anim .footer{transition:transform .24s ease}
+.ptr{
+  position:fixed;top:calc(12px + env(safe-area-inset-top));left:50%;z-index:70;
+  transform:translate(-50%,-64px);opacity:0;pointer-events:none;
+  transition:transform .22s ease,opacity .22s ease;
+}
+.ptr.is-drag{transition:none}
+.ptr__circle{
+  width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
+  background:var(--panel-2);border:1px solid var(--line-2);box-shadow:var(--shadow);
+}
+.ptr__arrow{
+  width:22px;height:22px;fill:none;stroke:var(--violet-2);
+  stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;
+  transition:transform .18s ease;
+}
+.ptr.is-ready .ptr__arrow{transform:rotate(180deg);stroke:var(--green)}
+.ptr.is-load .ptr__circle{animation:ptrSpin .8s linear infinite}
+.ptr.is-load .ptr__arrow{opacity:.35}
+@keyframes ptrSpin{to{transform:rotate(360deg)}}
+
 /* ============ тосты ============ */
 .toasts{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:95;display:flex;flex-direction:column;gap:8px;pointer-events:none}
 .toast{
