@@ -8,6 +8,8 @@ const START_BALANCE = 10000;                 // 100.00 в демо-валюте 
 const STORE_KEY = 'upgrader.demo.v2';
 
 const $ = (sel, root = document) => root.querySelector(sel);
+/* страницы разные, поэтому подписываемся только на то, что есть в разметке */
+const on = (sel, ev, fn) => { const el = $(sel); if (el) el.addEventListener(ev, fn); };
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 const byId = id => ITEMS.find(i => i.id === id);
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -18,8 +20,10 @@ const money = cents => '$' + (cents / 100).toLocaleString('en-US',
   { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 /* ---------- состояние ---------- */
-let state = { balance: START_BALANCE, inv: [], uid: 1 };
-let sel = { from: null, to: null };   // from — uid из инвентаря, to — id из каталога
+let state = { balance: START_BALANCE, inv: [], uid: 1, sel: { from: null, to: null } };
+/* from — uid из инвентаря, to — id из каталога; хранится в state, чтобы выбор
+   на странице магазина доехал до апгрейдера */
+let sel = state.sel;
 let spinning = false;
 let modalMode = 'from';
 
@@ -29,7 +33,15 @@ function load() {
     if (raw) {
       const p = JSON.parse(raw);
       if (p && typeof p.balance === 'number' && Array.isArray(p.inv)) {
-        state = { balance: p.balance, inv: p.inv.filter(x => byId(x.id)), uid: p.uid || 1 };
+        const keep = p.sel && typeof p.sel === 'object' ? p.sel : {};
+        state = {
+          balance: p.balance,
+          inv: p.inv.filter(x => byId(x.id)),
+          uid: p.uid || 1,
+          sel: { from: keep.from ?? null, to: byId(keep.to) ? keep.to : null },
+        };
+        sel = state.sel;
+        if (!state.inv.some(x => x.uid === sel.from)) sel.from = null;
         return;
       }
     }
@@ -84,6 +96,7 @@ function pickedHTML(item) {
 /* ---------- баланс ---------- */
 function renderBalance() {
   const el = $('#balance');
+  if (!el) return;
   el.textContent = money(state.balance);
   const box = el.closest('.balance');
   box.classList.remove('is-bump');
@@ -95,6 +108,7 @@ function renderBalance() {
 let shopFilter = { q: '', sort: 'asc', rarity: new Set() };
 
 function renderChips() {
+  if (!$('#chips')) return;
   $('#chips').innerHTML = Object.entries(RARITY).map(([key, r]) =>
     `<button data-rar="${key}" style="color:${r.color}"><i></i>${r.name}</button>`
   ).join('');
@@ -114,6 +128,7 @@ function shopList() {
 }
 
 function renderShop() {
+  if (!$('#shop-grid')) return;
   const list = shopList();
   $('#shop-grid').innerHTML = list.length
     ? list.map(i => cardHTML(i, { action: 'buy' })).join('')
@@ -123,6 +138,7 @@ function renderShop() {
 /* ---------- инвентарь ---------- */
 function renderInv() {
   const grid = $('#inv-grid');
+  if (!grid) return;
   grid.innerHTML = state.inv.length
     ? state.inv.map(x => cardHTML(byId(x.id), { action: 'sell', uid: x.uid })).join('')
     : `<div class="empty">Инвентарь пуст — купите предмет в магазине, чтобы начать апгрейд.</div>`;
@@ -147,6 +163,7 @@ function chance() {
 }
 
 function renderUpgrader() {
+  if (!$('#from-body')) return;
   const f = fromItem(), t = toItem();
 
   $('#from-body').innerHTML = f ? pickedHTML(f)
@@ -180,6 +197,7 @@ function renderUpgrader() {
 }
 
 function renderMults() {
+  if (!$('#mults')) return;
   $('#mults').innerHTML = MULTIPLIERS
     .map(m => `<button data-m="${m}">×${m}</button>`).join('');
 }
@@ -192,6 +210,7 @@ function applyMult(m) {
   const best = ITEMS.reduce((a, b) =>
     Math.abs(b.price - target) < Math.abs(a.price - target) ? b : a);
   sel.to = best.id;
+  save();
   renderUpgrader();
 }
 
@@ -281,6 +300,7 @@ function closeResult(sell) {
 
 /* ---------- модалка выбора ---------- */
 function openModal(mode) {
+  if (!$('#modal')) return;
   modalMode = mode;
   $('#modal-title').textContent = mode === 'from' ? 'Предмет из инвентаря' : 'Желаемый предмет';
   $('#modal-search').value = '';
@@ -309,7 +329,7 @@ function renderModal() {
   $('#modal-grid').innerHTML = html;
 }
 
-function closeModal() { $('#modal').hidden = true; }
+function closeModal() { const m = $('#modal'); if (m) m.hidden = true; }
 
 /* ---------- лента ---------- */
 function addFeed({ nick, from, to, win }) {
@@ -320,6 +340,7 @@ function addFeed({ nick, from, to, win }) {
     <div class="feed__line">${from.name} → ${to.name} | ${to.skin}</div>
     <div class="feed__x">×${(to.price / from.price).toFixed(2)} · ${win ? 'успех' : 'провал'}</div>`;
   const row = $('#feed');
+  if (!row) return;
   row.prepend(el);
   while (row.children.length > 24) row.lastElementChild.remove();
 }
@@ -335,6 +356,7 @@ function fakeFeed() {
 
 /* ---------- счётчики ---------- */
 function counters() {
+  if (!$('#stat-online')) return;
   let online = Math.round(rnd(2400, 3100));
   let upg = Math.round(rnd(48000, 61000));
   const paint = () => {
@@ -361,6 +383,7 @@ function bind() {
     if (modalCard) {
       if (modalMode === 'from') sel.from = Number(modalCard.dataset.uid);
       else sel.to = modalCard.dataset.id;
+      save();
       closeModal();
       renderUpgrader();
       return;
@@ -389,12 +412,19 @@ function bind() {
       return;
     }
 
-    // карточка магазина -> сразу в правый слот
+    // карточка магазина -> в правый слот апгрейдера
     const shopCard = e.target.closest('#shop-grid .card');
     if (shopCard) {
       sel.to = shopCard.dataset.id;
-      renderUpgrader();
-      $('#upgrade').scrollIntoView({ behavior: 'smooth' });
+      save();
+      const item = byId(sel.to);
+      if ($('#upgrade')) {
+        renderUpgrader();
+        $('#upgrade').scrollIntoView({ behavior: 'smooth' });
+      } else {
+        toast(`${item.name} | ${item.skin} — цель апгрейда`, 'ok');
+        setTimeout(() => { location.href = 'index.html#upgrade'; }, 450);
+      }
       return;
     }
 
@@ -402,8 +432,9 @@ function bind() {
     const invCard = e.target.closest('#inv-grid .card');
     if (invCard) {
       sel.from = Number(invCard.dataset.uid);
+      save();
       renderUpgrader();
-      $('#upgrade').scrollIntoView({ behavior: 'smooth' });
+      if ($('#upgrade')) $('#upgrade').scrollIntoView({ behavior: 'smooth' });
       return;
     }
 
@@ -424,23 +455,23 @@ function bind() {
     if (e.target.closest('[data-close]')) closeModal();
   });
 
-  $('#go').addEventListener('click', spin);
-  $('#modal-search').addEventListener('input', renderModal);
-  $('#search').addEventListener('input', e => { shopFilter.q = e.target.value; renderShop(); });
-  $('#sort').addEventListener('change', e => { shopFilter.sort = e.target.value; renderShop(); });
+  on('#go', 'click', spin);
+  on('#modal-search', 'input', renderModal);
+  on('#search', 'input', e => { shopFilter.q = e.target.value; renderShop(); });
+  on('#sort', 'change', e => { shopFilter.sort = e.target.value; renderShop(); });
 
-  $('#result-keep').addEventListener('click', () => closeResult(false));
-  $('#result-sell').addEventListener('click', () => closeResult(true));
+  on('#result-keep', 'click', () => closeResult(false));
+  on('#result-sell', 'click', () => closeResult(true));
 
-  $('#topup').addEventListener('click', () => {
+  on('#topup', 'click', () => {
     state.balance += START_BALANCE;
     save(); renderBalance();
     toast(`Начислено ${money(START_BALANCE)} демо-баланса`, 'ok');
   });
-  $('#login').addEventListener('click', () =>
+  on('#login', 'click', () =>
     toast('Демо-режим: авторизация Steam не подключена'));
 
-  $('#sell-all').addEventListener('click', () => {
+  on('#sell-all', 'click', () => {
     if (!state.inv.length) { toast('Инвентарь пуст', 'err'); return; }
     const sum = state.inv.reduce((s, x) => s + byId(x.id).price, 0);
     state.inv = [];
@@ -450,15 +481,20 @@ function bind() {
     toast(`Инвентарь продан за ${money(sum)}`, 'ok');
   });
 
-  $('#burger').addEventListener('click', () => $('#nav').classList.toggle('is-open'));
+  on('#burger', 'click', () => $('#nav').classList.toggle('is-open'));
   $$('#nav a').forEach(a => a.addEventListener('click', () => $('#nav').classList.remove('is-open')));
 
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { closeModal(); if (!$('#result').hidden) closeResult(false); }
+    if (e.key === 'Escape') {
+      closeModal();
+      const r = $('#result');
+      if (r && !r.hidden) closeResult(false);
+    }
   });
 
   // подсветка активного пункта меню
-  const links = $$('#nav a');
+  const links = $$('#nav a').filter(a => a.getAttribute('href').startsWith('#'));
+  if (!links.length) return;
   const obs = new IntersectionObserver(entries => {
     entries.forEach(en => {
       if (!en.isIntersecting) return;
@@ -482,7 +518,8 @@ function pullToRefresh() {
   let startY = 0, startX = 0, dist = 0, tracking = false, ready = false, busy = false;
 
   const atTop = () => (window.scrollY || document.documentElement.scrollTop) <= 0;
-  const blocked = () => busy || !$('#modal').hidden || !$('#result').hidden;
+  const hiddenOrAbsent = id => { const n = $(id); return !n || n.hidden; };
+  const blocked = () => busy || !hiddenOrAbsent('#modal') || !hiddenOrAbsent('#result');
 
   const root = document.documentElement;
 

@@ -159,8 +159,15 @@ h1,h2,h3,h4{margin:0;line-height:1.15;letter-spacing:-.02em}
   padding:28px;box-shadow:var(--shadow);
 }
 .upgrader__grid{
-  display:grid;grid-template-columns:1fr auto 1fr;gap:24px;align-items:center;
+  display:grid;gap:24px;align-items:center;
+  grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);
+  grid-template-areas:
+    "wheel to"
+    "from  to";
 }
+.wheel{grid-area:wheel;justify-self:center}
+#slot-from{grid-area:from}
+#slot-to{grid-area:to;align-self:stretch}
 
 .slot{
   background:var(--panel);border:1px solid var(--line);border-radius:var(--r);
@@ -196,8 +203,8 @@ img.art{aspect-ratio:3/2;object-fit:contain;background:transparent}
 .picked__price{margin-top:8px;font-weight:800;color:var(--gold);font-size:17px}
 
 /* ============ барабан ============ */
-.wheel{position:relative;width:280px;height:280px;display:grid;place-items:center}
-.wheel__svg{width:280px;height:280px;transform:rotate(-90deg)}
+.wheel{position:relative;width:min(400px,100%);aspect-ratio:1;display:grid;place-items:center}
+.wheel__svg{width:100%;height:100%;transform:rotate(-90deg)}
 .wheel__track{fill:none;stroke:rgba(255,255,255,.07);stroke-width:16}
 .wheel__zone{
   fill:none;stroke:var(--green);stroke-width:16;
@@ -208,9 +215,9 @@ img.art{aspect-ratio:3/2;object-fit:contain;background:transparent}
 .wheel__needle{stroke:#fff;stroke-width:3;fill:#fff;transform-origin:120px 120px}
 .wheel__needle circle{filter:drop-shadow(0 0 6px rgba(255,255,255,.7))}
 .wheel__center{position:absolute;text-align:center;pointer-events:none}
-.wheel__chance{font-size:38px;font-weight:800;letter-spacing:-.03em}
-.wheel__chance i{font-style:normal;font-size:20px;color:var(--muted)}
-.wheel__hint{font-size:12.5px;color:var(--muted);margin-top:2px}
+.wheel__chance{font-size:clamp(38px,5.6vw,54px);font-weight:800;letter-spacing:-.03em;line-height:1}
+.wheel__chance i{font-style:normal;font-size:.5em;color:var(--muted)}
+.wheel__hint{font-size:13.5px;color:var(--muted);margin-top:4px}
 .wheel.is-win .wheel__chance{color:var(--green)}
 .wheel.is-lose .wheel__chance{color:var(--red)}
 
@@ -318,6 +325,36 @@ img.art{aspect-ratio:3/2;object-fit:contain;background:transparent}
   grid-column:1/-1;text-align:center;color:var(--muted);
   border:1.5px dashed var(--line-2);border-radius:var(--r);padding:44px 20px;
 }
+
+/* ============ переход в магазин ============ */
+.shopcta__box{
+  display:flex;align-items:center;gap:24px;flex-wrap:wrap;
+  background:linear-gradient(135deg,rgba(123,92,250,.16),rgba(46,230,168,.1));
+  border:1px solid var(--line-2);border-radius:var(--r);padding:26px 28px;
+  transition:.18s transform,.18s border-color,.18s box-shadow;
+}
+.shopcta__box:hover{transform:translateY(-3px);border-color:var(--violet);box-shadow:0 20px 40px -24px var(--violet)}
+.shopcta__box h2{font-size:clamp(22px,3vw,28px);font-weight:800}
+.shopcta__box p{color:var(--muted);margin:10px 0 0;max-width:640px;font-size:14.5px}
+.shopcta__go{
+  margin-left:auto;white-space:nowrap;font-weight:800;font-size:15px;
+  background:linear-gradient(135deg,var(--violet),#5b3ff0);color:#fff;
+  padding:13px 22px;border-radius:12px;box-shadow:0 10px 26px -12px var(--violet);
+}
+.shopcta__back{
+  display:inline-block;margin-top:28px;color:var(--muted);font-weight:700;font-size:14px;
+  border:1px solid var(--line-2);border-radius:11px;padding:11px 18px;transition:.16s;
+}
+.shopcta__back:hover{color:var(--txt);background:rgba(255,255,255,.06)}
+
+/* ============ страница магазина ============ */
+.section--shop{padding-top:44px;overflow:hidden}
+.shop__head{position:relative;z-index:1;margin-bottom:26px}
+.shop__head h1{font-size:clamp(28px,4.4vw,42px);font-weight:800}
+.shop__head p{color:var(--muted);margin:12px 0 0;max-width:720px}
+.section--shop .section__head{margin-bottom:18px}
+.section--shop .filters{margin-left:0;width:100%}
+.section--shop .filters input{flex:1;min-width:220px}
 
 /* ============ шаги ============ */
 .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
@@ -449,11 +486,14 @@ html.ptr-anim main,html.ptr-anim .footer{transition:transform .24s ease}
   .footer__in{grid-template-columns:1fr 1fr}
 }
 @media (max-width:900px){
-  .upgrader__grid{grid-template-columns:1fr;justify-items:center}
+  .upgrader__grid{
+    grid-template-columns:1fr;justify-items:center;
+    grid-template-areas:"wheel" "from" "to";
+  }
   .slot{width:100%;min-height:auto}
   .picked .art{max-width:280px}
-  .wheel,.wheel__svg{width:240px;height:240px}
-  .wheel__chance{font-size:32px}
+  .wheel{width:min(300px,86vw)}
+  .wheel__chance{font-size:clamp(30px,10vw,40px)}
 }
 @media (max-width:640px){
   .section{padding:52px 0}
