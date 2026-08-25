@@ -466,6 +466,77 @@ function bind() {
 }
 
 
+
+/* ---------- обновление страницы потягиванием сверху ---------- */
+const PTR_TRIGGER = 70;   // ход индикатора, после которого сработает обновление
+const PTR_MAX = 110;      // дальше индикатор не уходит
+const PTR_RESIST = 0.6;   // сопротивление: 70px хода ≈ 117px движения пальца
+
+function pullToRefresh() {
+  if (!('ontouchstart' in window)) return;   // жест только для сенсорных экранов
+
+  const el = $('#ptr');
+  let startY = 0, startX = 0, dist = 0, tracking = false, ready = false, busy = false;
+
+  const atTop = () => (window.scrollY || document.documentElement.scrollTop) <= 0;
+  const blocked = () => busy || !$('#modal').hidden || !$('#result').hidden;
+
+  const root = document.documentElement;
+
+  const move = (px, drag) => {
+    el.classList.toggle('is-drag', drag);
+    root.classList.toggle('ptr-anim', !drag);
+    root.style.setProperty('--ptr', `${px}px`);            // сдвигаем саму страницу
+    el.style.transform = `translate(-50%, ${Math.min(px, 64) - 64}px)`;
+    el.style.opacity = px > 8 ? '1' : '0';
+  };
+  const reset = () => {
+    tracking = false; ready = false; dist = 0;
+    el.classList.remove('is-drag', 'is-ready');
+    root.classList.add('ptr-anim');
+    root.style.setProperty('--ptr', '0px');
+    el.style.transform = ''; el.style.opacity = '';
+  };
+
+  document.addEventListener('touchstart', e => {
+    if (blocked() || e.touches.length !== 1 || !atTop()) return;
+    startY = e.touches[0].clientY;
+    startX = e.touches[0].clientX;
+    tracking = true; dist = 0;
+  }, { passive: true });
+
+  document.addEventListener('touchmove', e => {
+    if (!tracking || blocked()) return;
+    const dy = e.touches[0].clientY - startY;
+    const dx = e.touches[0].clientX - startX;
+
+    // ушли вверх или вбок (горизонтальные ленты) — жест не наш
+    if (dy <= 0 || Math.abs(dx) > Math.abs(dy)) { reset(); return; }
+    if (!atTop()) { reset(); return; }
+
+    e.preventDefault();                        // держим страницу на месте
+    dist = Math.min(dy * PTR_RESIST, PTR_MAX);
+    ready = dist >= PTR_TRIGGER;
+    el.classList.toggle('is-ready', ready);
+    move(dist, true);
+  }, { passive: false });
+
+  document.addEventListener('touchend', () => {
+    if (!tracking) return;
+    if (ready) {
+      busy = true;
+      el.classList.remove('is-drag', 'is-ready');
+      el.classList.add('is-load');
+      move(56, false);
+      setTimeout(() => location.reload(), 320);
+      return;
+    }
+    reset();
+  }, { passive: true });
+
+  document.addEventListener('touchcancel', reset, { passive: true });
+}
+
 /* ---------- мобильные ограничения: без зума, только портрет ---------- */
 function mobileGuards() {
   // iOS игнорирует user-scalable=no в meta, поэтому гасим жесты масштабирования вручную
@@ -509,6 +580,7 @@ function init() {
   renderUpgrader();
   bind();
   mobileGuards();
+  pullToRefresh();
   counters();
   for (let i = 0; i < 8; i++) fakeFeed();
   setInterval(fakeFeed, 4200);
