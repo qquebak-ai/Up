@@ -27,6 +27,23 @@ npx http-server . -p 8080
 # http://localhost:8080
 ```
 
+## Деплой на Vercel
+
+Проект статический, шага сборки нет — Vercel отдаёт файлы как есть.
+
+**Через интерфейс:** [vercel.com/new](https://vercel.com/new) → Import Git Repository → выбрать этот
+репозиторий → Framework Preset: **Other**, Build Command и Output Directory оставить пустыми → Deploy.
+
+**Через CLI:**
+
+```bash
+npm i -g vercel
+vercel login
+vercel --prod
+```
+
+Настройки заголовков и кэширования лежат в `vercel.json`.
+
 ## Структура
 
 ```
