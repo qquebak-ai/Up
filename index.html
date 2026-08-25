@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=5">
+<link rel="stylesheet" href="assets/css/style.css?v=6">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>⚡</text></svg>">
 </head>
 <body>
@@ -44,7 +44,7 @@
 
     <nav class="nav" id="nav">
       <a href="#upgrade" class="is-active">Апгрейд</a>
-      <a href="#shop">Магазин</a>
+      <a href="shop.html">Магазин</a>
       <a href="#inventory">Инвентарь</a>
       <a href="#how">Как играть</a>
       <a href="#faq">FAQ</a>
@@ -145,22 +145,16 @@
   </div>
 </section>
 
-<!-- ================= МАГАЗИН ================= -->
-<section class="section" id="shop">
+<!-- ================= ПЕРЕХОД В МАГАЗИН ================= -->
+<section class="section shopcta">
   <div class="wrap">
-    <div class="section__head">
-      <h2>Магазин предметов</h2>
-      <div class="filters">
-        <input type="search" id="search" placeholder="Поиск: AWP, нож, Азимов…" aria-label="Поиск">
-        <select id="sort" aria-label="Сортировка">
-          <option value="asc">Сначала дешёвые</option>
-          <option value="desc">Сначала дорогие</option>
-          <option value="name">По названию</option>
-        </select>
+    <a class="shopcta__box" href="shop.html">
+      <div>
+        <h2>Магазин предметов</h2>
+        <p>24 настоящих скина CS2 с ценами и картинками с площадки Steam — от P250 за копейки до керамбита. Купите предмет или выберите цель апгрейда.</p>
       </div>
-    </div>
-    <div class="chips" id="chips"></div>
-    <div class="grid" id="shop-grid"></div>
+      <span class="shopcta__go">Открыть магазин →</span>
+    </a>
   </div>
 </section>
 
@@ -257,7 +251,7 @@
     <div class="footer__col">
       <h4>Разделы</h4>
       <a href="#upgrade">Апгрейд</a>
-      <a href="#shop">Магазин</a>
+      <a href="shop.html">Магазин</a>
       <a href="#inventory">Инвентарь</a>
       <a href="#faq">FAQ</a>
     </div>
@@ -320,8 +314,8 @@
 
 <div class="toasts" id="toasts"></div>
 
-<script src="assets/js/data.js?v=5"></script>
-<script src="assets/js/weapons.js?v=5"></script>
-<script src="assets/js/app.js?v=5"></script>
+<script src="assets/js/data.js?v=6"></script>
+<script src="assets/js/weapons.js?v=6"></script>
+<script src="assets/js/app.js?v=6"></script>
 </body>
 </html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Магазин предметов — UPGRADER</title>
+<meta name="description" content="Магазин скинов CS2: настоящие предметы с ценами и картинками с площадки Steam. Демонстрационный проект на виртуальном балансе.">
+<meta name="theme-color" content="#0a0c13">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css?v=6">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>⚡</text></svg>">
+</head>
+<body>
+
+<!-- ================= ОБНОВЛЕНИЕ ПОТЯГИВАНИЕМ ================= -->
+<div class="ptr" id="ptr" aria-hidden="true">
+  <div class="ptr__circle">
+    <svg viewBox="0 0 24 24" class="ptr__arrow" aria-hidden="true">
+      <path d="M12 5v10M7.5 10.5 12 15l4.5-4.5"/>
+    </svg>
+    <svg viewBox="0 0 24 24" class="ptr__spin" aria-hidden="true">
+      <circle cx="12" cy="12" r="9" stroke-dasharray="40 17"/>
+    </svg>
+  </div>
+</div>
+
+<div class="promo">
+  <span class="dot"></span>
+  Демо-проект: баланс виртуальный, реальные ставки и вывод отсутствуют · 18+
+</div>
+
+<header class="header">
+  <div class="wrap header__in">
+    <a class="logo" href="#">
+      <span class="logo__mark">UP</span>
+      <span class="logo__text">UPGRADER<em>.pro</em></span>
+    </a>
+
+    <nav class="nav" id="nav">
+      <a href="index.html#upgrade">Апгрейд</a>
+      <a href="shop.html" class="is-active">Магазин</a>
+      <a href="index.html#inventory">Инвентарь</a>
+      <a href="index.html#how">Как играть</a>
+      <a href="index.html#faq">FAQ</a>
+    </nav>
+
+    <div class="header__right">
+      <div class="balance" title="Баланс демо-счёта">
+        <svg viewBox="0 0 24 24" class="coin" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h5M9.5 14.5h5" fill="none" stroke="#0a0c13" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <span id="balance">0</span>
+      </div>
+      <button class="btn btn--ghost" id="topup" aria-label="Пополнить баланс">Пополнить</button>
+      <button class="btn btn--primary" id="login">Войти через Steam</button>
+      <button class="burger" id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="section section--shop" id="shop">
+  <div class="glow glow--a"></div>
+  <div class="wrap">
+    <div class="shop__head">
+      <h1>Магазин предметов</h1>
+      <p>Настоящие скины CS2: названия, износ, цены и картинки взяты с витрины Steam Community Market. Покупка идёт на демо-баланс — нажмите «Купить», чтобы забрать предмет в инвентарь, или кликните по карточке, чтобы поставить её целью апгрейда.</p>
+    </div>
+
+    <div class="section__head">
+      <div class="filters">
+        <input type="search" id="search" placeholder="Поиск: AWP, Karambit, Redline…" aria-label="Поиск">
+        <select id="sort" aria-label="Сортировка">
+          <option value="asc">Сначала дешёвые</option>
+          <option value="desc">Сначала дорогие</option>
+          <option value="name">По названию</option>
+        </select>
+      </div>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="grid" id="shop-grid"></div>
+
+    <a class="shopcta__back" href="index.html#upgrade">← Вернуться к апгрейду</a>
+  </div>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="wrap footer__in">
+    <div class="footer__col">
+      <a class="logo" href="#">
+        <span class="logo__mark">UP</span>
+        <span class="logo__text">UPGRADER<em>.pro</em></span>
+      </a>
+      <p>Учебный клон интерфейса апгрейдера скинов. Изображения и цены предметов — с витрины Steam Community Market. Проект не связан с Valve Corporation и не является азартной игрой на деньги.</p>
+    </div>
+    <div class="footer__col">
+      <h4>Разделы</h4>
+      <a href="index.html#upgrade">Апгрейд</a>
+      <a href="shop.html">Магазин</a>
+      <a href="index.html#inventory">Инвентарь</a>
+      <a href="index.html#faq">FAQ</a>
+    </div>
+    <div class="footer__col">
+      <h4>Документы</h4>
+      <a href="index.html#faq">Пользовательское соглашение</a>
+      <a href="index.html#faq">Политика конфиденциальности</a>
+      <a href="index.html#how">Честная игра</a>
+    </div>
+    <div class="footer__col">
+      <h4>Ответственная игра</h4>
+      <p>Сервис доступен только совершеннолетним. Играйте с умом и не пытайтесь отыграться.</p>
+      <span class="age">18+</span>
+    </div>
+  </div>
+  <div class="wrap footer__bottom">
+    <span>© <span id="year"></span> UPGRADER — демонстрационный проект</span>
+    <span>Counter-Strike и скины — торговые марки Valve Corporation</span>
+  </div>
+</footer>
+
+<!-- ================= ТОЛЬКО ПОРТРЕТ ================= -->
+<div class="rotate" id="rotate" aria-hidden="true">
+  <div class="rotate__box">
+    <svg viewBox="0 0 64 64" class="rotate__icon" aria-hidden="true">
+      <rect x="20" y="6" width="24" height="42" rx="4"/>
+      <path d="M14 52a20 20 0 0 0 36 0" fill="none" stroke-linecap="round"/>
+      <path d="M50 46v8h-8"/>
+    </svg>
+    <div class="rotate__title">Поверните телефон</div>
+    <p>Сайт рассчитан на вертикальную ориентацию экрана.</p>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script src="assets/js/data.js?v=6"></script>
+<script src="assets/js/weapons.js?v=6"></script>
+<script src="assets/js/app.js?v=6"></script>
+</body>
+</html>
