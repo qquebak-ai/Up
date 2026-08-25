@@ -147,7 +147,25 @@ function renderInv() {
 }
 
 /* ---------- шанс и барабан ---------- */
-const CIRC = 2 * Math.PI * 100;
+/* длина окружности зоны берётся из разметки, чтобы радиус можно было менять в вёрстке */
+const ZONE_R = Number($('#wheel-zone')?.getAttribute('r')) || 96;
+const CIRC = 2 * Math.PI * ZONE_R;
+
+/* насечки по ободу барабана */
+function renderWheelTicks() {
+  const g = $('#wheel-ticks');
+  if (!g) return;
+  const out = [];
+  for (let a = 0; a < 360; a += 5) {
+    const major = a % 45 === 0;
+    const rad = a * Math.PI / 180;
+    const r1 = major ? 104 : 107.5;
+    const p = (r, fn) => (120 + fn(rad) * r).toFixed(1);
+    out.push(`<line class="${major ? 'major' : ''}" stroke-width="${major ? 2 : 1}" stroke-linecap="round"` +
+      ` x1="${p(r1, Math.cos)}" y1="${p(r1, Math.sin)}" x2="${p(113, Math.cos)}" y2="${p(113, Math.sin)}"/>`);
+  }
+  g.innerHTML = out.join('');
+}
 
 function fromItem() {
   const rec = state.inv.find(x => x.uid === sel.from);
@@ -225,6 +243,7 @@ function spin() {
   spinning = true;
   const wheel = $('.wheel');
   wheel.classList.remove('is-win', 'is-lose');
+  wheel.classList.add('is-spin');
   $('#go').classList.add('is-spin');
   renderUpgrader();
 
@@ -256,6 +275,7 @@ function finish(win, f, t, wheel) {
   }
   save();
 
+  wheel.classList.remove('is-spin');
   wheel.classList.add(win ? 'is-win' : 'is-lose');
   $('#wheel-hint').textContent = win ? 'апгрейд успешен' : 'ставка сгорела';
   addFeed({ nick: 'Вы', from: f, to: t, win });
@@ -618,6 +638,7 @@ function init() {
   $('#year').textContent = new Date().getFullYear();
   renderChips();
   renderChances();
+  renderWheelTicks();
   renderBalance();
   renderShop();
   renderInv();
