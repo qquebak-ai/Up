@@ -3,12 +3,13 @@
    снимок каталога от 2026-08-25. price — цена в центах, icon — токен картинки CDN Steam.
    Баланс в игре виртуальный: покупка и продажа реальных предметов не производится. */
 
+/* Палитра NEON FORGE: сталь → cyan → violet → magenta → lime */
 const RARITY = {
-  mil:    { name: 'Армейское',      color: '#4b69ff' },
-  res:    { name: 'Запрещённое',    color: '#8847ff' },
-  clas:   { name: 'Засекреченное',  color: '#d32ce6' },
-  cov:    { name: 'Тайное',         color: '#eb4b4b' },
-  knife:  { name: 'Нож / Перчатки', color: '#ffd700' },
+  mil:    { name: 'STANDARD',  color: '#5b7590' },
+  res:    { name: 'ENHANCED',  color: '#20e6ff' },
+  clas:   { name: 'CLASSIFIED', color: '#8b5cf6' },
+  cov:    { name: 'COVERT',    color: '#ff3d8b' },
+  knife:  { name: 'EXOTIC',    color: '#b8ff3d' },
 };
 
 /* type — силуэт оружия на случай, если картинка не загрузится (см. weapons.js) */

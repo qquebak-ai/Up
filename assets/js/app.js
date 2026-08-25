@@ -1,177 +1,156 @@
-/* ================= UPGRADER — демо-логика ================= */
+/* ================= NEON FORGE — логика демо-кузницы ================= */
 'use strict';
 
-const HOUSE_EDGE = 0.92;   // возврат по шансу
+const HOUSE_EDGE = 0.92;          // возврат по шансу
 const MAX_CHANCE = 0.92;
 const MIN_CHANCE = 0.01;
-const START_BALANCE = 10000;                 // 100.00 в демо-валюте (цены хранятся в центах)
-const STORE_KEY = 'upgrader.demo.v2';
+const START_BALANCE = 10000;      // 100.00 (цены хранятся в центах)
+const STORE_KEY = 'neonforge.demo.v3';
+
+const PHASES = [
+  { id: 'scanning',    ms: 800,  state: 'SCANNING' },
+  { id: 'calculating', ms: 800,  state: 'CALCULATING' },
+  { id: 'forging',     ms: 1500, state: 'FORGING' },
+  { id: 'resonance',   ms: 1000, state: 'RESONANCE' },
+];
+const SPIN_MS = PHASES[2].ms + PHASES[3].ms;
 
 const $ = (sel, root = document) => root.querySelector(sel);
-/* страницы разные, поэтому подписываемся только на то, что есть в разметке */
-const on = (sel, ev, fn) => { const el = $(sel); if (el) el.addEventListener(ev, fn); };
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+const on = (sel, ev, fn) => { const el = $(sel); if (el) el.addEventListener(ev, fn); };
 const byId = id => ITEMS.find(i => i.id === id);
 const rnd = (a, b) => a + Math.random() * (b - a);
 const pick = arr => arr[Math.floor(Math.random() * arr.length)];
-const fmt = n => Math.round(n).toLocaleString('ru-RU');
-/* цены с площадки приходят в центах — храним их как есть, а показываем в долларах */
 const money = cents => '$' + (cents / 100).toLocaleString('en-US',
   { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const calm = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ---------- состояние ---------- */
-let state = { balance: START_BALANCE, inv: [], uid: 1, sel: { from: null, to: null, pct: null } };
-/* from — uid из инвентаря, to — id из каталога; хранится в state, чтобы выбор
-   на странице магазина доехал до апгрейдера */
+let state = { balance: START_BALANCE, inv: [], uid: 1, xp: 0, sel: { from: null, to: null, pct: null } };
 let sel = state.sel;
-let spinning = false;
+let running = false;
 let modalMode = 'from';
 
 function load() {
   try {
-    const raw = localStorage.getItem(STORE_KEY);
-    if (raw) {
-      const p = JSON.parse(raw);
-      if (p && typeof p.balance === 'number' && Array.isArray(p.inv)) {
-        const keep = p.sel && typeof p.sel === 'object' ? p.sel : {};
-        state = {
-          balance: p.balance,
-          inv: p.inv.filter(x => byId(x.id)),
-          uid: p.uid || 1,
-          sel: { from: keep.from ?? null, to: byId(keep.to) ? keep.to : null, pct: keep.pct ?? null },
-        };
-        sel = state.sel;
-        if (!state.inv.some(x => x.uid === sel.from)) sel.from = null;
-        return;
-      }
+    const p = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
+    if (p && typeof p.balance === 'number' && Array.isArray(p.inv)) {
+      const keep = p.sel && typeof p.sel === 'object' ? p.sel : {};
+      state = {
+        balance: p.balance,
+        inv: p.inv.filter(x => byId(x.id)),
+        uid: p.uid || 1,
+        xp: p.xp || 0,
+        sel: { from: keep.from ?? null, to: byId(keep.to) ? keep.to : null, pct: keep.pct ?? null },
+      };
+      sel = state.sel;
+      if (!state.inv.some(x => x.uid === sel.from)) sel.from = null;
+      return;
     }
   } catch (e) { /* повреждённые данные — стартуем заново */ }
   state.inv = STARTER_INVENTORY.map(id => ({ uid: state.uid++, id }));
 }
-function save() {
-  try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {}
-}
+const save = () => { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {} };
 
 /* ---------- уведомления ---------- */
 function toast(text, kind = '') {
+  const box = $('#toasts');
+  if (!box) return;
   const el = document.createElement('div');
   el.className = `toast ${kind}`;
   el.textContent = text;
-  $('#toasts').append(el);
+  box.append(el);
   setTimeout(() => {
-    el.style.transition = 'opacity .3s, transform .3s';
-    el.style.opacity = '0';
-    el.style.transform = 'translateX(24px)';
+    el.style.cssText = 'transition:opacity .3s,transform .3s;opacity:0;transform:translateX(24px)';
     setTimeout(() => el.remove(), 320);
   }, 2600);
 }
 
-/* ---------- карточка предмета ---------- */
-function cardHTML(item, { action = '', uid = null, tag = true } = {}) {
+/* ---------- разметка предметов ---------- */
+function cardHTML(item, { action = '', uid = null } = {}) {
   const r = RARITY[item.rarity];
   return `
   <article class="card" style="--rc:${r.color}" data-id="${item.id}" ${uid ? `data-uid="${uid}"` : ''}>
-    <div class="card__rar"></div>
-    ${tag ? `<span class="card__tag">${r.name}</span>` : ''}
+    <span class="card__edge"></span>
+    <span class="card__scan"></span>
+    <span class="tag card__rar">${r.name}</span>
     ${itemArt(item)}
-    <div class="card__name">${item.name}</div>
-    <div class="card__skin">${item.skin}${item.wear ? `<span class="wear">${item.wear}</span>` : ''}</div>
+    <div class="card__n">${item.name}</div>
+    <div class="card__meta"><em>${item.skin}</em>${item.wear ? `<span class="wear">${item.wear}</span>` : ''}</div>
+    <div class="card__inspect"><span>INSPECT</span><span>${item.type.toUpperCase()}</span></div>
     <div class="card__foot">
-      <span class="card__price">${money(item.price)}</span>
-      ${action ? `<button class="card__btn" data-act="${action}">${action === 'buy' ? 'Купить' : 'Продать'}</button>` : ''}
+      <span class="card__p">${money(item.price)}</span>
+      ${action ? `<button class="card__act" data-act="${action}">${action === 'buy' ? 'ACQUIRE' : 'SELL'}</button>` : ''}
     </div>
   </article>`;
 }
 
-function pickedHTML(item) {
+function unitHTML(item) {
   return `
-  <div class="picked">
+  <div class="unit">
     ${itemArt(item)}
-    <div class="picked__name">${item.name}</div>
-    <div class="picked__skin">${item.skin}${item.wear ? `<span class="wear">${item.wear}</span>` : ''}</div>
-    <div class="picked__price">${money(item.price)}</div>
+    <div class="unit__n">${item.name}</div>
+    <div class="unit__s">${item.skin}${item.wear ? ` <span class="wear">${item.wear}</span>` : ''}</div>
+    <div class="unit__p">${money(item.price)}</div>
   </div>`;
 }
 
-/* ---------- баланс ---------- */
+const emptyBay = side => `
+  <button class="bay__pick" data-open="${side}">
+    <i>+</i>${side === 'from' ? 'LOAD ITEM' : 'SET TARGET'}
+  </button>`;
+
+/* ---------- баланс и уровень кузницы ---------- */
 function renderBalance() {
   const el = $('#balance');
   if (!el) return;
   el.textContent = money(state.balance);
-  const box = el.closest('.balance');
-  box.classList.remove('is-bump');
-  void box.offsetWidth;
-  box.classList.add('is-bump');
+  const box = el.closest('.bal');
+  box.classList.remove('is-bump'); void box.offsetWidth; box.classList.add('is-bump');
 }
 
-/* ---------- магазин ---------- */
-let shopFilter = { q: '', sort: 'asc', rarity: new Set() };
-
-function renderChips() {
-  if (!$('#chips')) return;
-  $('#chips').innerHTML = Object.entries(RARITY).map(([key, r]) =>
-    `<button data-rar="${key}" style="color:${r.color}"><i></i>${r.name}</button>`
-  ).join('');
+const xpAt = l => 2 * (l - 1) * l;              // сколько опыта нужно на уровень l
+function levelInfo(xp) {
+  let l = 1;
+  while (xp >= xpAt(l + 1)) l++;
+  const base = xpAt(l), next = xpAt(l + 1);
+  return { level: l, into: xp - base, need: next - base };
+}
+function renderLevel() {
+  if (!$('#lvl-num')) return;
+  const { level, into, need } = levelInfo(state.xp);
+  $('#lvl-num').textContent = level;
+  $('#lvl-xp').textContent = `${into}/${need}`;
+  $('#lvl-fill').style.width = `${Math.round(into / need * 100)}%`;
+  // ядро наливается светом по мере роста уровня
+  const core = $('#core');
+  if (core) core.style.setProperty('--lvl', Math.min(1, level / 30).toFixed(2));
 }
 
-function shopList() {
-  const q = shopFilter.q.trim().toLowerCase();
-  let list = ITEMS.filter(i => {
-    if (shopFilter.rarity.size && !shopFilter.rarity.has(i.rarity)) return false;
-    if (!q) return true;
-    return (`${i.name} ${i.skin} ${i.wear || ''} ${RARITY[i.rarity].name}`).toLowerCase().includes(q);
-  });
-  if (shopFilter.sort === 'asc') list.sort((a, b) => a.price - b.price);
-  if (shopFilter.sort === 'desc') list.sort((a, b) => b.price - a.price);
-  if (shopFilter.sort === 'name') list.sort((a, b) => a.name.localeCompare(b.name, 'ru'));
-  return list;
-}
-
-function renderShop() {
-  if (!$('#shop-grid')) return;
-  const list = shopList();
-  $('#shop-grid').innerHTML = list.length
-    ? list.map(i => cardHTML(i, { action: 'buy' })).join('')
-    : `<div class="empty">По вашему запросу ничего не найдено.</div>`;
-}
-
-/* ---------- инвентарь ---------- */
+/* ---------- инвентарь и витрины ---------- */
 function renderInv() {
   const grid = $('#inv-grid');
   if (!grid) return;
   grid.innerHTML = state.inv.length
     ? state.inv.map(x => cardHTML(byId(x.id), { action: 'sell', uid: x.uid })).join('')
-    : `<div class="empty">Инвентарь пуст — купите предмет в магазине, чтобы начать апгрейд.</div>`;
+    : '<div class="empty">STORAGE EMPTY — ПРИОБРЕТИТЕ ПРЕДМЕТ В МАРКЕТЕ</div>';
   $('#inv-count').textContent = state.inv.length;
   $('#inv-sum').textContent = money(state.inv.reduce((s, x) => s + byId(x.id).price, 0));
 }
 
-/* ---------- шанс и барабан ---------- */
-/* длина окружности зоны берётся из разметки, чтобы радиус можно было менять в вёрстке */
-const ZONE_R = Number($('#wheel-zone')?.getAttribute('r')) || 96;
-const CIRC = 2 * Math.PI * ZONE_R;
-
-/* насечки по ободу барабана */
-function renderWheelTicks() {
-  const g = $('#wheel-ticks');
-  if (!g) return;
-  const out = [];
-  for (let a = 0; a < 360; a += 5) {
-    const major = a % 45 === 0;
-    const rad = a * Math.PI / 180;
-    const r1 = major ? 104 : 107.5;
-    const p = (r, fn) => (120 + fn(rad) * r).toFixed(1);
-    out.push(`<line class="${major ? 'major' : ''}" stroke-width="${major ? 2 : 1}" stroke-linecap="round"` +
-      ` x1="${p(r1, Math.cos)}" y1="${p(r1, Math.sin)}" x2="${p(113, Math.cos)}" y2="${p(113, Math.sin)}"/>`);
-  }
-  g.innerHTML = out.join('');
+function renderPopular() {
+  const grid = $('#popular');
+  if (!grid) return;
+  grid.innerHTML = [...ITEMS].sort((a, b) => b.price - a.price).slice(0, 8)
+    .map(i => cardHTML(i, { action: 'buy' })).join('');
 }
 
-function fromItem() {
-  const rec = state.inv.find(x => x.uid === sel.from);
-  return rec ? byId(rec.id) : null;
-}
-function toItem() { return sel.to ? byId(sel.to) : null; }
+/* ---------- ядро: шанс ---------- */
+const ARC_R = 88;
+const ARC_C = 2 * Math.PI * ARC_R;
+
+const fromItem = () => { const r = state.inv.find(x => x.uid === sel.from); return r ? byId(r.id) : null; };
+const toItem = () => (sel.to ? byId(sel.to) : null);
 
 function chance() {
   const f = fromItem(), t = toItem();
@@ -180,113 +159,196 @@ function chance() {
   return Math.min(MAX_CHANCE, Math.max(MIN_CHANCE, (f.price / t.price) * HOUSE_EDGE));
 }
 
-function renderUpgrader() {
+function renderCoreTicks() {
+  const g = $('#core-ticks');
+  if (!g) return;
+  const out = [];
+  for (let a = 0; a < 360; a += 6) {
+    const major = a % 45 === 0;
+    const rad = a * Math.PI / 180;
+    const p = (r, fn) => (130 + fn(rad) * r).toFixed(1);
+    out.push(`<line class="core__tick${major ? ' major' : ''}" stroke-width="${major ? 1.8 : 1}"` +
+      ` x1="${p(major ? 100 : 103, Math.cos)}" y1="${p(major ? 100 : 103, Math.sin)}"` +
+      ` x2="${p(108, Math.cos)}" y2="${p(108, Math.sin)}"/>`);
+  }
+  g.innerHTML = out.join('');
+}
+
+function renderForge() {
   if (!$('#from-body')) return;
   const f = fromItem(), t = toItem();
 
-  $('#from-body').innerHTML = f ? pickedHTML(f)
-    : `<button class="slot__empty" data-open="from"><span class="plus">+</span>Выбрать из инвентаря</button>`;
-  $('#to-body').innerHTML = t ? pickedHTML(t)
-    : `<button class="slot__empty" data-open="to"><span class="plus">+</span>Выбрать из магазина</button>`;
-
-  $('#slot-from').classList.toggle('is-filled', !!f);
-  $('#slot-to').classList.toggle('is-filled', !!t);
+  $('#from-body').innerHTML = f ? unitHTML(f) : emptyBay('from');
+  $('#to-body').innerHTML = t ? unitHTML(t) : emptyBay('to');
+  $('#bay-from').classList.toggle('is-set', !!f);
+  $('#bay-to').classList.toggle('is-set', !!t);
 
   const c = chance();
-  $('#chance').innerHTML = `${(c * 100).toFixed(2)}<i>%</i>`;
-  $('#wheel-zone').style.strokeDasharray = `${(c * CIRC).toFixed(2)} ${CIRC.toFixed(2)}`;
+  $('#chance').innerHTML = `${(c * 100).toFixed(1)}<i>%</i>`;
+  $('#chance-scale').style.width = `${(c * 100).toFixed(1)}%`;
+  $('#core-arc').style.strokeDasharray = `${(c * ARC_C).toFixed(2)} ${ARC_C.toFixed(2)}`;
 
-  $('#meta-bet').textContent = f ? money(f.price) : '—';
-  $('#meta-win').textContent = t ? money(t.price) : '—';
+  $('#meta-in').textContent = f ? money(f.price) : '—';
+  $('#meta-out').textContent = t ? money(t.price) : '—';
 
-  const go = $('#go');
-  go.disabled = !(f && t) || spinning;
-  go.textContent = spinning ? 'Крутим…'
-    : !f ? 'Выберите свой предмет'
-    : !t ? 'Выберите желаемый предмет'
-    : `Апгрейд ×${(t.price / f.price).toFixed(2)}`;
+  const btn = $('#forge-btn');
+  btn.disabled = !(f && t) || running;
+  $('#forge-sub').textContent = running ? 'CORE ACTIVE'
+    : !f ? 'LOAD AN ITEM TO BEGIN'
+    : !t ? 'SET A TARGET'
+    : `×${(t.price / f.price).toFixed(2)} · ${money(f.price)} → ${money(t.price)}`;
 
-  // подсвечен тот пресет, который нажали: каталог редкий, точное попадание в 50% невозможно
-  $$('#chances button').forEach(b =>
-    b.classList.toggle('is-on', t !== null && sel.pct === Number(b.dataset.c)));
+  $$('#presets button').forEach(b =>
+    b.classList.toggle('is-on', !!t && sel.pct === Number(b.dataset.c)));
 }
 
-function renderChances() {
-  if (!$('#chances')) return;
-  $('#chances').innerHTML = CHANCES
-    .map(c => `<button data-c="${c}"><b>${c}%</b><span>шанс</span></button>`).join('');
+function renderPresets() {
+  const box = $('#presets');
+  if (!box) return;
+  box.innerHTML = CHANCES.map(c => `<button data-c="${c}"><b>${c}%</b><span>TARGET</span></button>`).join('');
 }
 
-/* подобрать предмет под желаемый шанс: цена цели = цена вашей / шанс * комиссия */
-function applyChance(pct) {
+/* подобрать цель под желаемый шанс */
+function applyPreset(pct) {
   const f = fromItem();
-  if (!f) { toast('Сначала выберите свой предмет', 'err'); return; }
+  if (!f) { toast('Сначала загрузите предмет в приёмник A', 'err'); return; }
   const want = pct / 100;
   const err = i => Math.abs(Math.min(MAX_CHANCE, f.price * HOUSE_EDGE / i.price) - want);
-  const best = ITEMS
-    .filter(i => i.price > f.price)                  // апгрейд, а не размен вниз
+  const best = ITEMS.filter(i => i.price > f.price)
     .reduce((a, b) => (!a || err(b) < err(a) ? b : a), null);
   if (!best) { toast('Дороже этого предмета в каталоге ничего нет', 'err'); return; }
   sel.to = best.id;
   sel.pct = pct;
   save();
-  renderUpgrader();
+  renderForge();
   const real = Math.round(chance() * 100);
-  if (Math.abs(real - pct) > 5) toast(`Ближайший предмет даёт ${real}% вместо ${pct}%`);
+  if (Math.abs(real - pct) > 5) toast(`Ближайшая цель даёт ${real}% вместо ${pct}%`);
 }
 
-/* ---------- прокрут ---------- */
-function spin() {
-  const f = fromItem(), t = toItem();
-  if (!f || !t || spinning) return;
+/* ---------- частицы вокруг ядра ---------- */
+function coreParticles() {
+  const cv = $('#core-canvas');
+  if (!cv || calm()) return { run() {}, burst() {}, calm() {} };
+  const ctx = cv.getContext('2d');
+  let w = 0, h = 0, mode = 'idle', until = 0;
+  const parts = Array.from({ length: 64 }, () => ({
+    a: Math.random() * Math.PI * 2,
+    r: 34 + Math.random() * 78,
+    sp: (0.0016 + Math.random() * 0.004) * (Math.random() < 0.5 ? -1 : 1),
+    sz: 0.5 + Math.random() * 1.5,
+    al: 0.15 + Math.random() * 0.5,
+    lime: Math.random() < 0.22,
+  }));
 
-  spinning = true;
-  const wheel = $('.wheel');
-  wheel.classList.remove('is-win', 'is-lose');
-  wheel.classList.add('is-spin');
-  $('#go').classList.add('is-spin');
-  renderUpgrader();
+  const resize = () => {
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    const r = cv.getBoundingClientRect();
+    w = r.width; h = r.height;
+    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  };
+  resize();
+  addEventListener('resize', resize);
+
+  const frame = () => {
+    ctx.clearRect(0, 0, w, h);
+    const cx = w / 2, cy = h / 2, k = Math.min(w, h) / 260;
+    const boost = mode === 'run' ? 4.2 : 1;
+    const bursting = mode === 'burst' && performance.now() < until;
+    for (const p of parts) {
+      p.a += p.sp * boost;
+      if (bursting) p.r += 1.6;
+      else if (p.r > 112) p.r = 34 + Math.random() * 20;
+      const x = cx + Math.cos(p.a) * p.r * k;
+      const y = cy + Math.sin(p.a) * p.r * k;
+      ctx.globalAlpha = bursting ? Math.max(0, p.al * (1 - (p.r - 34) / 120)) : p.al * (mode === 'run' ? 1.4 : 1);
+      ctx.fillStyle = p.lime ? '#B8FF3D' : '#20E6FF';
+      ctx.beginPath();
+      ctx.arc(x, y, p.sz * (mode === 'run' ? 1.3 : 1), 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
+
+  return {
+    run() { mode = 'run'; },
+    calm() { mode = 'idle'; },
+    burst() { mode = 'burst'; until = performance.now() + 900; setTimeout(() => { mode = 'idle'; parts.forEach(p => { p.r = 34 + Math.random() * 78; }); }, 950); },
+  };
+}
+let particles = { run() {}, burst() {}, calm() {} };
+
+/* ---------- запуск ядра ---------- */
+function setPhase(id) {
+  $$('#phases li').forEach(li => {
+    const idx = PHASES.findIndex(p => p.id === li.dataset.p);
+    const cur = PHASES.findIndex(p => p.id === id);
+    li.classList.toggle('is-now', li.dataset.p === id);
+    li.classList.toggle('is-done', cur >= 0 && idx >= 0 && idx < cur);
+  });
+}
+function clearPhases() {
+  $$('#phases li').forEach(li => li.classList.remove('is-now', 'is-done'));
+}
+
+function forge() {
+  const f = fromItem(), t = toItem();
+  if (!f || !t || running) return;
+
+  running = true;
+  const core = $('#core');
+  core.classList.remove('is-win', 'is-fail');
+  core.classList.add('is-run');
+  particles.run();
+  renderForge();
 
   const c = chance();
   const win = Math.random() < c;
   const zone = c * 360;
-  const angle = win ? rnd(3, Math.max(4, zone - 3)) : rnd(zone + 3, 357);
-  const total = 360 * 5 + angle;
+  const angle = win ? rnd(4, Math.max(5, zone - 4)) : rnd(zone + 4, 356);
 
-  const needle = $('#wheel-needle');
-  needle.style.transition = 'none';
-  needle.style.transform = 'rotate(0deg)';
-  void needle.getBoundingClientRect();
-  needle.style.transition = 'transform 4.2s cubic-bezier(.12,.72,.15,1)';
-  needle.style.transform = `rotate(${total}deg)`;
+  let t0 = 0;
+  PHASES.forEach(ph => {
+    setTimeout(() => {
+      setPhase(ph.id);
+      $('#core-state').textContent = ph.state;
+      if (ph.id === 'forging') {
+        const m = $('#core-marker');
+        m.style.transition = 'none';
+        m.style.transform = 'rotate(0deg)';
+        void m.getBoundingClientRect();
+        m.style.transition = `transform ${SPIN_MS}ms cubic-bezier(.13,.71,.16,1)`;
+        m.style.transform = `rotate(${360 * 5 + angle}deg)`;
+      }
+    }, t0);
+    t0 += ph.ms;
+  });
 
-  $('#wheel-hint').textContent = 'барабан крутится…';
-
-  setTimeout(() => finish(win, f, t, wheel), 4300);
+  setTimeout(() => settle(win, f, t, core), t0);
 }
 
-function finish(win, f, t, wheel) {
-  // ставка списывается в любом случае
-  state.inv = state.inv.filter(x => x.uid !== sel.from);
+function settle(win, f, t, core) {
+  state.inv = state.inv.filter(x => x.uid !== sel.from);      // ставка списывается всегда
   let wonUid = null;
-  if (win) {
-    wonUid = state.uid++;
-    state.inv.push({ uid: wonUid, id: t.id });
-  }
+  if (win) { wonUid = state.uid++; state.inv.push({ uid: wonUid, id: t.id }); }
+  state.xp += win ? 3 : 1;
   save();
 
-  wheel.classList.remove('is-spin');
-  wheel.classList.add(win ? 'is-win' : 'is-lose');
-  $('#wheel-hint').textContent = win ? 'апгрейд успешен' : 'ставка сгорела';
-  addFeed({ nick: 'Вы', from: f, to: t, win });
+  core.classList.remove('is-run');
+  core.classList.add(win ? 'is-win' : 'is-fail');
+  $('#core-state').textContent = win ? 'FORGED' : 'COLLAPSED';
+  setPhase('result');
+  win ? particles.burst() : particles.calm();
 
+  pushRecent({ who: 'YOU', from: f, to: t, win });
   showResult(win, win ? t : f, wonUid);
 
-  sel.from = null;   // цель остаётся выбранной для быстрого повтора
-  spinning = false;
-  $('#go').classList.remove('is-spin');
-  renderInv();
-  renderUpgrader();
+  sel.from = null;
+  running = false;
+  renderBalance(); renderLevel(); renderInv(); renderForge();
+  setTimeout(clearPhases, 2600);
 }
 
 /* ---------- окно результата ---------- */
@@ -295,12 +357,12 @@ let pendingWin = null;
 function showResult(win, item, uid) {
   pendingWin = win ? uid : null;
   const box = $('#result');
-  const title = $('#result-title');
-  title.className = `result__title ${win ? 'win' : 'lose'}`;
-  title.textContent = win ? 'Апгрейд удался!' : 'Не повезло';
-  $('#result-card').innerHTML = pickedHTML(item);
+  box.className = `result ${win ? 'win' : 'fail'}`;
+  $('#result-st').textContent = win ? 'CORE OUTPUT' : 'CORE COLLAPSED';
+  $('#result-title').textContent = win ? `${item.name} | ${item.skin}` : 'Резонанс не удержан';
+  $('#result-card').innerHTML = unitHTML(item);
   $('#result-sell').hidden = !win;
-  $('#result-keep').textContent = win ? 'В инвентарь' : 'Продолжить';
+  $('#result-keep').textContent = win ? 'TO STORAGE' : 'CONTINUE';
   box.hidden = false;
 }
 
@@ -311,9 +373,7 @@ function closeResult(sell) {
       const item = byId(rec.id);
       state.inv = state.inv.filter(x => x.uid !== pendingWin);
       state.balance += item.price;
-      save();
-      renderBalance();
-      renderInv();
+      save(); renderBalance(); renderInv();
       toast(`Продано за ${money(item.price)}`, 'ok');
     }
   }
@@ -325,148 +385,154 @@ function closeResult(sell) {
 function openModal(mode) {
   if (!$('#modal')) return;
   modalMode = mode;
-  $('#modal-title').textContent = mode === 'from' ? 'Предмет из инвентаря' : 'Желаемый предмет';
+  $('#modal-title').textContent = mode === 'from' ? 'INPUT / ИНВЕНТАРЬ' : 'TARGET / КАТАЛОГ';
   $('#modal-search').value = '';
   renderModal();
   $('#modal').hidden = false;
   setTimeout(() => $('#modal-search').focus(), 30);
 }
-
 function renderModal() {
   const q = $('#modal-search').value.trim().toLowerCase();
-  const match = i => !q || (`${i.name} ${i.skin} ${i.wear || ''}`).toLowerCase().includes(q);
-  let html;
-
+  const match = i => !q || `${i.name} ${i.skin} ${i.wear || ''}`.toLowerCase().includes(q);
+  let list, html;
   if (modalMode === 'from') {
-    const list = state.inv.filter(x => match(byId(x.id)));
+    list = state.inv.filter(x => match(byId(x.id)));
     html = list.map(x => cardHTML(byId(x.id), { uid: x.uid })).join('');
-    $('#modal-empty').textContent = state.inv.length
-      ? 'Ничего не найдено.' : 'Инвентарь пуст — купите предмет в магазине.';
-    $('#modal-empty').hidden = list.length > 0;
+    $('#modal-empty').textContent = state.inv.length ? 'NOTHING FOUND' : 'STORAGE EMPTY';
   } else {
-    const list = ITEMS.filter(match).sort((a, b) => a.price - b.price);
+    list = ITEMS.filter(match).sort((a, b) => a.price - b.price);
     html = list.map(i => cardHTML(i)).join('');
-    $('#modal-empty').textContent = 'Ничего не найдено.';
-    $('#modal-empty').hidden = list.length > 0;
+    $('#modal-empty').textContent = 'NOTHING FOUND';
   }
+  $('#modal-empty').hidden = list.length > 0;
   $('#modal-grid').innerHTML = html;
 }
+const closeModal = () => { const m = $('#modal'); if (m) m.hidden = true; };
 
-function closeModal() { const m = $('#modal'); if (m) m.hidden = true; }
-
-/* ---------- лента ---------- */
-function addFeed({ nick, from, to, win }) {
-  const el = document.createElement('div');
-  el.className = `feed__item ${win ? 'win' : 'lose'}`;
-  el.innerHTML = `
-    <div class="feed__nick">${nick}</div>
-    <div class="feed__line">${from.name} → ${to.name} | ${to.skin}</div>
-    <div class="feed__x">×${(to.price / from.price).toFixed(2)} · ${win ? 'успех' : 'провал'}</div>`;
-  const row = $('#feed');
-  if (!row) return;
-  row.prepend(el);
-  while (row.children.length > 24) row.lastElementChild.remove();
+/* ---------- телеметрия ---------- */
+function pushRecent({ who, from, to, win }) {
+  const rail = $('#recent');
+  if (rail) {
+    const el = document.createElement('div');
+    el.className = `rec ${win ? 'win' : 'fail'}`;
+    el.innerHTML = `
+      <div class="rec__top">
+        <span class="rec__who">${who}</span>
+        <span class="rec__x">×${(to.price / from.price).toFixed(2)}</span>
+      </div>
+      <div class="rec__line">${from.name} → ${to.name} | ${to.skin}</div>
+      <div class="tag rec__st">${win ? 'FORGED' : 'COLLAPSED'} · ${money(to.price)}</div>`;
+    rail.prepend(el);
+    while (rail.children.length > 20) rail.lastElementChild.remove();
+  }
+  pushLive({ who, to, win });
 }
 
-function fakeFeed() {
-  const from = pick(ITEMS.slice(0, 14));
+function pushLive({ who, to, win }) {
+  const list = $('#live-list');
+  if (!list) return;
+  const el = document.createElement('div');
+  el.className = `live__row ${win ? 'win' : 'fail'}`;
+  const time = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+  el.innerHTML = `<b>${who}</b><span>${win ? 'выковал' : 'потерял'} ${to.name} | ${to.skin}</span><i>${time}</i>`;
+  list.prepend(el);
+  while (list.children.length > 26) list.lastElementChild.remove();
+}
+
+function fakeRun() {
+  const from = pick(ITEMS.slice(0, Math.max(6, Math.floor(ITEMS.length * 0.6))));
   const better = ITEMS.filter(i => i.price > from.price * 1.4);
   if (!better.length) return;
-  const to = pick(better.slice(0, 8));
+  const to = pick(better.slice(0, 10));
   const c = Math.min(MAX_CHANCE, (from.price / to.price) * HOUSE_EDGE);
-  addFeed({ nick: pick(NICKS), from, to, win: Math.random() < c });
+  pushRecent({ who: pick(NICKS), from, to, win: Math.random() < c });
 }
 
-/* ---------- счётчики ---------- */
-function counters() {
-  if (!$('#stat-online')) return;
-  let online = Math.round(rnd(2400, 3100));
-  let upg = Math.round(rnd(48000, 61000));
-  const paint = () => {
-    $('#stat-online').textContent = fmt(online);
-    $('#stat-upg').textContent = fmt(upg);
-  };
-  paint();
-  setInterval(() => {
-    online = Math.max(1800, online + Math.round(rnd(-14, 16)));
-    upg += Math.round(rnd(0, 5));
-    paint();
-  }, 2200);
+/* ---------- рыночная витрина (market.html) ---------- */
+let shopFilter = { q: '', sort: 'asc', rarity: new Set() };
+
+function renderChips() {
+  const box = $('#chips');
+  if (!box) return;
+  box.innerHTML = Object.entries(RARITY)
+    .map(([k, r]) => `<button data-rar="${k}" style="color:${r.color}"><i></i>${r.name}</button>`).join('');
+}
+function renderShop() {
+  const grid = $('#shop-grid');
+  if (!grid) return;
+  const q = shopFilter.q.trim().toLowerCase();
+  let list = ITEMS.filter(i => {
+    if (shopFilter.rarity.size && !shopFilter.rarity.has(i.rarity)) return false;
+    return !q || `${i.name} ${i.skin} ${i.wear || ''} ${RARITY[i.rarity].name}`.toLowerCase().includes(q);
+  });
+  if (shopFilter.sort === 'asc') list.sort((a, b) => a.price - b.price);
+  if (shopFilter.sort === 'desc') list.sort((a, b) => b.price - a.price);
+  if (shopFilter.sort === 'name') list.sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+  grid.innerHTML = list.length
+    ? list.map(i => cardHTML(i, { action: 'buy' })).join('')
+    : '<div class="empty">NOTHING FOUND</div>';
 }
 
 /* ---------- события ---------- */
 function bind() {
-  // открыть модалку (в т.ч. по кнопкам внутри слотов)
   document.addEventListener('click', e => {
     const open = e.target.closest('[data-open]');
     if (open) { openModal(open.dataset.open); return; }
 
-    // карточка в модалке
     const modalCard = e.target.closest('#modal-grid .card');
     if (modalCard) {
       if (modalMode === 'from') sel.from = Number(modalCard.dataset.uid);
       else { sel.to = modalCard.dataset.id; sel.pct = null; }
-      save();
-      closeModal();
-      renderUpgrader();
+      save(); closeModal(); renderForge();
       return;
     }
 
-    // покупка / продажа
     const act = e.target.closest('[data-act]');
     if (act) {
-      e.stopPropagation();
       const card = act.closest('.card');
       const item = byId(card.dataset.id);
       if (act.dataset.act === 'buy') {
-        if (state.balance < item.price) { toast('Недостаточно монет на балансе', 'err'); return; }
+        if (state.balance < item.price) { toast('Недостаточно средств на демо-балансе', 'err'); return; }
         state.balance -= item.price;
         state.inv.push({ uid: state.uid++, id: item.id });
         save(); renderBalance(); renderInv();
-        toast(`${item.name} | ${item.skin} — куплен`, 'ok');
+        toast(`${item.name} | ${item.skin} — в хранилище`, 'ok');
       } else {
         const uid = Number(card.dataset.uid);
         state.inv = state.inv.filter(x => x.uid !== uid);
         state.balance += item.price;
         if (sel.from === uid) sel.from = null;
-        save(); renderBalance(); renderInv(); renderUpgrader();
+        save(); renderBalance(); renderInv(); renderForge();
         toast(`Продано за ${money(item.price)}`, 'ok');
       }
       return;
     }
 
-    // карточка магазина -> в правый слот апгрейдера
-    const shopCard = e.target.closest('#shop-grid .card');
-    if (shopCard) {
-      sel.to = shopCard.dataset.id;
+    const target = e.target.closest('#shop-grid .card, #popular .card');
+    if (target) {
+      sel.to = target.dataset.id;
       sel.pct = null;
       save();
       const item = byId(sel.to);
-      if ($('#upgrade')) {
-        renderUpgrader();
-        $('#upgrade').scrollIntoView({ behavior: 'smooth' });
-      } else {
-        toast(`${item.name} | ${item.skin} — цель апгрейда`, 'ok');
-        setTimeout(() => { location.href = 'index.html#upgrade'; }, 450);
+      if ($('#forge')) { renderForge(); $('#forge').scrollIntoView({ behavior: 'smooth' }); }
+      else {
+        toast(`${item.name} | ${item.skin} — цель ядра`, 'ok');
+        setTimeout(() => { location.href = 'index.html#forge'; }, 450);
       }
       return;
     }
 
-    // карточка инвентаря -> в левый слот
     const invCard = e.target.closest('#inv-grid .card');
     if (invCard) {
       sel.from = Number(invCard.dataset.uid);
-      save();
-      renderUpgrader();
-      if ($('#upgrade')) $('#upgrade').scrollIntoView({ behavior: 'smooth' });
+      save(); renderForge();
+      if ($('#forge')) $('#forge').scrollIntoView({ behavior: 'smooth' });
       return;
     }
 
-    // пресеты желаемого шанса
-    const ch = e.target.closest('#chances button');
-    if (ch) { applyChance(Number(ch.dataset.c)); return; }
+    const preset = e.target.closest('#presets button');
+    if (preset) { applyPreset(Number(preset.dataset.c)); return; }
 
-    // фильтры по редкости
     const chip = e.target.closest('#chips button');
     if (chip) {
       const key = chip.dataset.rar;
@@ -479,78 +545,67 @@ function bind() {
     if (e.target.closest('[data-close]')) closeModal();
   });
 
-  on('#go', 'click', spin);
+  on('#forge-btn', 'click', forge);
   on('#modal-search', 'input', renderModal);
   on('#search', 'input', e => { shopFilter.q = e.target.value; renderShop(); });
   on('#sort', 'change', e => { shopFilter.sort = e.target.value; renderShop(); });
-
   on('#result-keep', 'click', () => closeResult(false));
   on('#result-sell', 'click', () => closeResult(true));
 
-  on('#topup', 'click', () => {
+  on('#deposit', 'click', () => {
     state.balance += START_BALANCE;
     save(); renderBalance();
-    toast(`Начислено ${money(START_BALANCE)} демо-баланса`, 'ok');
+    toast(`Зачислено ${money(START_BALANCE)} демо-баланса`, 'ok');
   });
-  on('#login', 'click', () =>
-    toast('Демо-режим: авторизация Steam не подключена'));
 
   on('#sell-all', 'click', () => {
-    if (!state.inv.length) { toast('Инвентарь пуст', 'err'); return; }
+    if (!state.inv.length) { toast('Хранилище пусто', 'err'); return; }
     const sum = state.inv.reduce((s, x) => s + byId(x.id).price, 0);
-    state.inv = [];
-    sel.from = null;
-    state.balance += sum;
-    save(); renderBalance(); renderInv(); renderUpgrader();
-    toast(`Инвентарь продан за ${money(sum)}`, 'ok');
+    state.inv = []; sel.from = null; state.balance += sum;
+    save(); renderBalance(); renderInv(); renderForge();
+    toast(`Хранилище продано за ${money(sum)}`, 'ok');
   });
 
   on('#burger', 'click', () => $('#nav').classList.toggle('is-open'));
   $$('#nav a').forEach(a => a.addEventListener('click', () => $('#nav').classList.remove('is-open')));
 
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      closeModal();
-      const r = $('#result');
-      if (r && !r.hidden) closeResult(false);
-    }
+    if (e.key !== 'Escape') return;
+    closeModal();
+    const r = $('#result');
+    if (r && !r.hidden) closeResult(false);
   });
 
-  // подсветка активного пункта меню
-  const links = $$('#nav a').filter(a => a.getAttribute('href').startsWith('#'));
-  if (!links.length) return;
+  const links = [...$$('#nav a'), ...$$('.tabbar a')].filter(a => a.getAttribute('href').startsWith('#'));
+  const sections = $$('main section[id]');
+  if (!links.length || !sections.length) return;
   const obs = new IntersectionObserver(entries => {
     entries.forEach(en => {
       if (!en.isIntersecting) return;
       links.forEach(a => a.classList.toggle('is-active', a.getAttribute('href') === `#${en.target.id}`));
     });
   }, { rootMargin: '-45% 0px -50% 0px' });
-  $$('main section[id]').forEach(s => obs.observe(s));
+  sections.forEach(s => obs.observe(s));
 }
 
-
-
-/* ---------- обновление страницы потягиванием сверху ---------- */
-const PTR_TRIGGER = 70;   // ход индикатора, после которого сработает обновление
-const PTR_MAX = 110;      // дальше индикатор не уходит
-const PTR_RESIST = 0.6;   // сопротивление: 70px хода ≈ 117px движения пальца
+/* ---------- обновление потягиванием ---------- */
+const PTR_TRIGGER = 70, PTR_MAX = 110, PTR_RESIST = 0.6;
 
 function pullToRefresh() {
-  if (!('ontouchstart' in window)) return;   // жест только для сенсорных экранов
-
+  if (!('ontouchstart' in window)) return;
   const el = $('#ptr');
+  if (!el) return;
+  const root = document.documentElement;
   let startY = 0, startX = 0, dist = 0, tracking = false, ready = false, busy = false;
 
-  const atTop = () => (window.scrollY || document.documentElement.scrollTop) <= 0;
-  const hiddenOrAbsent = id => { const n = $(id); return !n || n.hidden; };
-  const blocked = () => busy || !hiddenOrAbsent('#modal') || !hiddenOrAbsent('#result');
-
-  const root = document.documentElement;
+  const atTop = () => (window.scrollY || root.scrollTop) <= 0;
+  const free = id => { const n = $(id); return !n || n.hidden; };
+  const blocked = () => busy || !free('#modal') || !free('#result') || running;
 
   const move = (px, drag) => {
     el.classList.toggle('is-drag', drag);
     root.classList.toggle('ptr-anim', !drag);
-    root.style.setProperty('--ptr', `${px}px`);            // сдвигаем саму страницу
+    root.style.setProperty('--ptr', `${px}px`);
     el.style.transform = `translate(-50%, ${Math.min(px, 64) - 64}px)`;
     el.style.opacity = px > 8 ? '1' : '0';
   };
@@ -564,8 +619,7 @@ function pullToRefresh() {
 
   document.addEventListener('touchstart', e => {
     if (blocked() || e.touches.length !== 1 || !atTop()) return;
-    startY = e.touches[0].clientY;
-    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY; startX = e.touches[0].clientX;
     tracking = true; dist = 0;
   }, { passive: true });
 
@@ -573,12 +627,8 @@ function pullToRefresh() {
     if (!tracking || blocked()) return;
     const dy = e.touches[0].clientY - startY;
     const dx = e.touches[0].clientX - startX;
-
-    // ушли вверх или вбок (горизонтальные ленты) — жест не наш
-    if (dy <= 0 || Math.abs(dx) > Math.abs(dy)) { reset(); return; }
-    if (!atTop()) { reset(); return; }
-
-    e.preventDefault();                        // держим страницу на месте
+    if (dy <= 0 || Math.abs(dx) > Math.abs(dy) || !atTop()) { reset(); return; }
+    e.preventDefault();
     dist = Math.min(dy * PTR_RESIST, PTR_MAX);
     ready = dist >= PTR_TRIGGER;
     el.classList.toggle('is-ready', ready);
@@ -601,32 +651,28 @@ function pullToRefresh() {
   document.addEventListener('touchcancel', reset, { passive: true });
 }
 
-/* ---------- мобильные ограничения: без зума, только портрет ---------- */
+/* ---------- мобильные ограничения ---------- */
 function mobileGuards() {
-  // iOS игнорирует user-scalable=no в meta, поэтому гасим жесты масштабирования вручную
   ['gesturestart', 'gesturechange', 'gestureend'].forEach(type =>
     document.addEventListener(type, e => e.preventDefault(), { passive: false }));
 
-  // пинч двумя пальцами
   document.addEventListener('touchmove', e => {
     if (e.touches.length > 1) e.preventDefault();
   }, { passive: false });
 
-  // двойной тап тоже масштабирует страницу; на кнопках и полях не мешаем
   let lastTap = 0;
   document.addEventListener('touchend', e => {
     const now = Date.now();
-    const interactive = e.target.closest('button, a, input, select, textarea, summary, [data-open], .card');
+    const interactive = e.target.closest('button, a, input, select, textarea, [data-open], .card');
     if (now - lastTap < 350 && !interactive) e.preventDefault();
     lastTap = now;
   }, { passive: false });
 
-  // блокировка ориентации доступна только в установленном/полноэкранном режиме
   const lockPortrait = () => {
     try {
       const r = screen.orientation && screen.orientation.lock && screen.orientation.lock('portrait');
       if (r && typeof r.catch === 'function') r.catch(() => {});
-    } catch (e) { /* браузер не поддерживает — работает CSS-заглушка .rotate */ }
+    } catch (e) { /* нет поддержки — работает CSS-заглушка .rotate */ }
   };
   lockPortrait();
   document.addEventListener('fullscreenchange', lockPortrait);
@@ -635,20 +681,22 @@ function mobileGuards() {
 /* ---------- запуск ---------- */
 function init() {
   load();
-  $('#year').textContent = new Date().getFullYear();
+  const y = $('#year'); if (y) y.textContent = new Date().getFullYear();
   renderChips();
-  renderChances();
-  renderWheelTicks();
-  renderBalance();
   renderShop();
+  renderPresets();
+  renderCoreTicks();
+  renderBalance();
+  renderLevel();
   renderInv();
-  renderUpgrader();
+  renderPopular();
+  renderForge();
   bind();
+  particles = coreParticles();
   mobileGuards();
   pullToRefresh();
-  counters();
-  for (let i = 0; i < 8; i++) fakeFeed();
-  setInterval(fakeFeed, 4200);
+  for (let i = 0; i < 7; i++) fakeRun();
+  setInterval(fakeRun, 4600);
 }
 
 document.addEventListener('DOMContentLoaded', init);
