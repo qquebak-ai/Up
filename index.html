@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=8">
+<link rel="stylesheet" href="assets/css/style.css?v=9">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>⚡</text></svg>">
 </head>
 <body>
@@ -86,13 +86,39 @@
         <!-- Барабан -->
         <div class="wheel">
           <svg viewBox="0 0 240 240" class="wheel__svg" aria-hidden="true">
-            <circle class="wheel__track" cx="120" cy="120" r="100"/>
-            <circle class="wheel__zone" id="wheel-zone" cx="120" cy="120" r="100"/>
+            <defs>
+              <linearGradient id="zoneGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#2ee6a8"/>
+                <stop offset="55%" stop-color="#35e0d0"/>
+                <stop offset="100%" stop-color="#7b5cfa"/>
+              </linearGradient>
+              <linearGradient id="needleGrad" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#6f7690"/>
+                <stop offset="55%" stop-color="#e9ecf7"/>
+                <stop offset="100%" stop-color="#ffffff"/>
+              </linearGradient>
+              <radialGradient id="hubGrad" cx="50%" cy="38%" r="72%">
+                <stop offset="0%" stop-color="#1b2030"/>
+                <stop offset="100%" stop-color="#0a0c13"/>
+              </radialGradient>
+              <filter id="zoneGlow" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur stdDeviation="3.4" result="b"/>
+                <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+
+            <circle class="wheel__bezel" cx="120" cy="120" r="116"/>
+            <g class="wheel__ticks" id="wheel-ticks"></g>
+            <circle class="wheel__track" cx="120" cy="120" r="96"/>
+            <circle class="wheel__zone" id="wheel-zone" cx="120" cy="120" r="96" filter="url(#zoneGlow)"/>
+            <circle class="wheel__flash" id="wheel-flash" cx="120" cy="120" r="96"/>
+            <circle class="wheel__hub" cx="120" cy="120" r="70"/>
+            <circle class="wheel__hubline" cx="120" cy="120" r="70"/>
+
             <g class="wheel__needle" id="wheel-needle">
-              <line x1="120" y1="120" x2="214" y2="120"/>
-              <circle cx="214" cy="120" r="6"/>
+              <path class="needle__blade" d="M222 120 L188 110.5 L181 120 L188 129.5 Z"/>
+              <path class="needle__glint" d="M222 120 L188 110.5 L188 120 Z"/>
             </g>
-            <circle class="wheel__hub" cx="120" cy="120" r="62"/>
           </svg>
           <div class="wheel__center">
             <div class="wheel__chance" id="chance">0.00<i>%</i></div>
@@ -321,8 +347,8 @@
 
 <div class="toasts" id="toasts"></div>
 
-<script src="assets/js/data.js?v=8"></script>
-<script src="assets/js/weapons.js?v=8"></script>
-<script src="assets/js/app.js?v=8"></script>
+<script src="assets/js/data.js?v=9"></script>
+<script src="assets/js/weapons.js?v=9"></script>
+<script src="assets/js/app.js?v=9"></script>
 </body>
 </html>
