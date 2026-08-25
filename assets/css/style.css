@@ -92,13 +92,6 @@ main,.hdr,.foot{position:relative;z-index:1}
 .hdr__in{display:flex;align-items:center;gap:26px;height:74px;min-width:0}
 
 .brand{display:flex;align-items:center;gap:11px;flex:none;min-width:0}
-.brand__mark{
-  width:38px;height:38px;flex:none;display:grid;place-items:center;
-  border:1px solid var(--line-3);border-radius:11px;
-  background:linear-gradient(155deg,rgba(32,230,255,.18),rgba(139,92,246,.1));
-  box-shadow:0 0 22px -6px rgba(32,230,255,.5) inset;
-}
-.brand__mark svg{width:20px;height:20px;fill:none;stroke:var(--cyan);stroke-width:1.7;stroke-linejoin:round}
 .brand__txt{display:grid;line-height:1}
 .brand__txt b{font-size:16px;font-weight:800;letter-spacing:.07em}
 .brand__txt span{font:700 9px/1 var(--mono);letter-spacing:.32em;color:var(--dim-2);margin-top:4px}
@@ -695,16 +688,7 @@ html.ptr-anim .promo,html.ptr-anim .hdr,html.ptr-anim main,html.ptr-anim .foot{t
 
 /* ================= АДАПТИВ ================= */
 @media (max-width:1180px){
-  .hdr__in{flex-wrap:wrap;height:auto;padding:11px 0 0;gap:12px}
-  .nav{
-    order:3;width:100%;margin:0;gap:2px;
-    overflow-x:auto;scrollbar-width:none;
-    border-top:1px solid var(--line);padding:4px 0 2px;
-  }
-  .nav::-webkit-scrollbar{display:none}
-  .nav a{flex:none;padding:11px 12px}
-  .nav a.is-active::after{left:12px;right:12px;bottom:4px}
-  .hdr__right{margin-left:auto}
+  .nav{display:none}
   .split{grid-template-columns:1fr}
   .foot__in{grid-template-columns:1fr 1fr}
 }
@@ -721,8 +705,9 @@ html.ptr-anim .promo,html.ptr-anim .hdr,html.ptr-anim main,html.ptr-anim .foot{t
 @media (max-width:640px){
   .wrap{width:min(1320px,100% - 24px)}
   .sec{padding:52px 0}
-  .hdr__in{gap:8px;padding-top:10px}
-  .brand__txt{display:none}
+  .hdr__in{gap:8px;height:62px}
+  .brand{display:none}
+  .hdr__right{margin-left:0;width:100%;justify-content:space-between;gap:8px}
   .lvl{display:none}
   .wordmark{font-size:17px}
   [data-deposit]{padding:10px 13px;letter-spacing:.06em}
@@ -739,7 +724,13 @@ html.ptr-anim .promo,html.ptr-anim .hdr,html.ptr-anim main,html.ptr-anim .foot{t
 }
 @media (max-width:380px){
   .rec{width:190px}
-  .bal{padding:7px 9px;gap:6px}
+  .hdr__right{gap:6px}
+  .wordmark{font-size:15px;padding-right:0}
+  .bal{padding:7px 8px;gap:5px}
+  .bal b{font-size:12.5px}
+  .bal svg{width:13px;height:13px}
+  [data-deposit]{padding:9px 10px;font-size:11px;letter-spacing:.04em}
+  .avatar{width:34px;height:34px;border-radius:10px;font-size:12px}
 }
 @media (prefers-reduced-motion:reduce){
   .fx__grid,.fx__streak,.core__spin-a,.core__spin-b,.core__heart,.card__scan{animation:none!important}
