@@ -184,6 +184,10 @@ h1,h2,h3,h4{margin:0;line-height:1.15;letter-spacing:-.02em}
 }
 .slot__action:hover{color:var(--txt);background:rgba(255,255,255,.08)}
 
+/* картинки предметов с витрины Steam */
+img.art{aspect-ratio:3/2;object-fit:contain;background:transparent}
+.art{-webkit-user-select:none;user-select:none;-webkit-user-drag:none}
+
 /* выбранный предмет внутри слота */
 .picked{width:100%;text-align:center}
 .picked .art{width:100%;height:auto;margin:6px auto 10px;filter:drop-shadow(0 12px 20px rgba(0,0,0,.6))}
@@ -293,6 +297,11 @@ h1,h2,h3,h4{margin:0;line-height:1.15;letter-spacing:-.02em}
 .card .art{width:100%;height:auto;margin:14px 0 12px;position:relative;filter:drop-shadow(0 10px 16px rgba(0,0,0,.55))}
 .card__name{font-weight:800;font-size:14.5px;position:relative}
 .card__skin{font-size:12.5px;color:var(--muted);margin-top:2px;position:relative;flex:1}
+.wear{
+  display:inline-block;margin-left:6px;padding:1px 5px;border-radius:5px;
+  background:rgba(255,255,255,.07);color:var(--muted);
+  font-size:10.5px;font-weight:700;letter-spacing:.03em;vertical-align:1px;
+}
 .card__foot{display:flex;align-items:center;justify-content:space-between;margin-top:12px;position:relative;gap:8px}
 .card__price{font-weight:800;color:var(--gold);font-size:15px;white-space:nowrap}
 .card__btn{

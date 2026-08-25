@@ -1,4 +1,7 @@
-/* Каталог предметов. Цены — виртуальные монеты демо-режима. */
+/* Каталог предметов.
+   Названия, цены и картинки взяты с витрины Steam Community Market (CS2, appid 730),
+   снимок каталога от 2026-08-25. price — цена в центах, icon — токен картинки CDN Steam.
+   Баланс в игре виртуальный: покупка и продажа реальных предметов не производится. */
 
 const RARITY = {
   mil:    { name: 'Армейское',      color: '#4b69ff' },
@@ -8,34 +11,36 @@ const RARITY = {
   knife:  { name: 'Нож / Перчатки', color: '#ffd700' },
 };
 
-/* type — силуэт оружия (см. weapons.js) */
+/* type — силуэт оружия на случай, если картинка не загрузится (см. weapons.js) */
 const ITEMS = [
-  { id: 'p250-sand',      name: 'P250',        skin: 'Песчаная дюна',    type: 'pistol', rarity: 'mil',   price: 12 },
-  { id: 'mp9-storm',      name: 'MP9',         skin: 'Штормовая волна',  type: 'smg',    rarity: 'mil',   price: 24 },
-  { id: 'nova-polar',     name: 'Nova',        skin: 'Полярная мгла',    type: 'rifle',  rarity: 'mil',   price: 31 },
-  { id: 'glock-water',    name: 'Glock-18',    skin: 'Водная стихия',    type: 'pistol', rarity: 'mil',   price: 46 },
-  { id: 'mac10-neon',     name: 'MAC-10',      skin: 'Неоновый райдер',  type: 'smg',    rarity: 'res',   price: 78 },
-  { id: 'famas-roll',     name: 'FAMAS',       skin: 'Роликовая волна',  type: 'rifle',  rarity: 'res',   price: 95 },
-  { id: 'usp-cortex',     name: 'USP-S',       skin: 'Кортекс',          type: 'pistol', rarity: 'res',   price: 134 },
-  { id: 'ak-phantom',     name: 'AK-47',       skin: 'Фантом',           type: 'rifle',  rarity: 'res',   price: 210 },
-  { id: 'awp-atheris',    name: 'AWP',         skin: 'Атерис',           type: 'awp',    rarity: 'res',   price: 265 },
-  { id: 'm4-desolate',    name: 'M4A1-S',      skin: 'Пустошь',          type: 'rifle',  rarity: 'clas',  price: 380 },
-  { id: 'ak-neonrider',   name: 'AK-47',       skin: 'Неоновый гонщик',  type: 'rifle',  rarity: 'clas',  price: 520 },
-  { id: 'deagle-blaze',   name: 'Desert Eagle',skin: 'Пламя',            type: 'pistol', rarity: 'clas',  price: 690 },
-  { id: 'awp-neonoir',    name: 'AWP',         skin: 'Неонуар',          type: 'awp',    rarity: 'clas',  price: 880 },
-  { id: 'ak-redline',     name: 'AK-47',       skin: 'Красная линия',    type: 'rifle',  rarity: 'cov',   price: 1150 },
-  { id: 'm4-printstream', name: 'M4A1-S',      skin: 'Печатный поток',   type: 'rifle',  rarity: 'cov',   price: 1740 },
-  { id: 'awp-asiimov',    name: 'AWP',         skin: 'Азимов',           type: 'awp',    rarity: 'cov',   price: 2300 },
-  { id: 'ak-fireserp',    name: 'AK-47',       skin: 'Огненный змей',    type: 'rifle',  rarity: 'cov',   price: 4200 },
-  { id: 'awp-dragon',     name: 'AWP',         skin: 'Драконий огонь',   type: 'awp',    rarity: 'cov',   price: 6100 },
-  { id: 'karambit-fade',  name: 'Керамбит',    skin: 'Градиент',         type: 'knife',  rarity: 'knife', price: 11500 },
-  { id: 'bayonet-doppler',name: 'Штык-нож',    skin: 'Доплер «Фаза 2»',  type: 'knife',  rarity: 'knife', price: 17800 },
-  { id: 'butterfly-marb', name: 'Бабочка',     skin: 'Мраморный градиент',type:'knife',  rarity: 'knife', price: 29400 },
-  { id: 'gloves-vice',    name: 'Перчатки',    skin: 'Порок',            type: 'gloves', rarity: 'knife', price: 43000 },
+  { id: 'p250-sedimentary-mw',             name: 'P250',              skin: 'Sedimentary',             wear: 'MW',  type: 'pistol',  rarity: 'mil',    price: 8,       icon: 'i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLhzMOwwjFU6s23bahhL-esHXCZ0-JJvOhuRz39xk9w62XRyNr9eCrDPwV0CpsiROAIsxC-kNyxNb7q71bcjY1GzXqsiTQJsHicAIc5kQ' },
+  { id: 'nova-dark-sigil-mw',              name: 'Nova',              skin: 'Dark Sigil',              wear: 'MW',  type: 'rifle',   rarity: 'mil',    price: 18,      icon: 'i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL_kYDhwixU-fORbLZsK_uSHFicyOl-pK8xG3q1lk0l4m2HmI6odXiRbwF1CJchQbEI4RK8kNPiMb-24A3W3YoX02yg2YjfpjSA' },
+  { id: 'mp9-storm-bs',                    name: 'MP9',               skin: 'Storm',                   wear: 'BS',  type: 'smg',     rarity: 'mil',    price: 39,      icon: 'i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL8js_f7i1k_OaheqlrMv-dGliYxO9gqa8_Sirhlkt0sWzWzov9cXiWb1AgC5QhRuEL5BbtmofuMung7wCN3dpF02yg2fy0-LC1' },
+  { id: 'g3sg1-dream-glade-ww',            name: 'G3SG1',             skin: 'Dream Glade',             wear: 'WW',  type: 'awp',     rarity: 'res',    price: 81,      icon: 'i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL2zYXnrB1Y-s2pO7dqcc-UAmaUxNF7teVgWiT9xUR36m_Wm9ioJX7FalAiD5AjRuYKsETsldW1ZOvg71eLgt8Qm33-jTQJsHiK03zX7w' },
+  { id: 'galil-ar-rocket-pop-ft',          name: 'Galil AR',          skin: 'Rocket Pop',              wear: 'FT',  type: 'rifle',   rarity: 'mil',    price: 156,     icon: 'i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL2n5rp8SNJ0PG7V6NsLPmfD3Wv0e9kpOhqQyygqhAitzSQl8Gsc3OfOFIlCZZ4QLUJthe9l4WzMePitVPfj9lHxS-vhn9M7C0_5roBT-N7rZShS-lh' },
+  { id: 'm4a4-choppa-fn',                  name: 'M4A4',              skin: 'Choppa',                  wear: 'FN',  type: 'rifle',   rarity: 'mil',    price: 233,     icon: 'i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL8ypexwi8P7qaRb7ZoJf6sDWadztF6ueZhW2fjl05-6mzVmdmgcHOTZgIhXpJ1RO5c4Bjql9DjMunhsgOL34gUnnr-kGoXuTonsfJ3' },
+  { id: 'usp-s-jawbreaker-ft',             name: 'USP-S',             skin: 'Jawbreaker',              wear: 'FT',  type: 'pistol',  rarity: 'clas',   price: 502,     icon: 'i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLkjYbf7itX6vytbbZSNeODHViUzulxqd5kSi26gBBp42mDz939J32VZwFyA8FxReBesRO8wdK0ZrzitQ2K2oMTzCWviCMb5jErvbgcxKeE5g' },
+  { id: 'ak-47-phantom-disruptor-mw',      name: 'AK-47',             skin: 'Phantom Disruptor',       wear: 'MW',  type: 'rifle',   rarity: 'clas',   price: 963,     icon: 'i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLwlcK3wiFO0POlJfA6H-CbD2mEzuNJtOh6XTyjgRI1jDGMnYftb3qTbQMpCZVxF-8Ku0Xtw4XkYu2xtQSL3d5FxSz-3H5Ovy895epRA6E7uvqAsbzZtpo' },
+  { id: 'famas-survivor-z-fn',             name: 'FAMAS',             skin: 'Survivor Z',              wear: 'FN',  type: 'rifle',   rarity: 'mil',    price: 1092,    icon: 'i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL3n5vh7h1Y-s2oaalsM8-fC2mEwNF6ueZhW2exlE8hsTzcw4n4JC7BOAQpCscmRrRe5xW7w9TgNu7itAHWiYpAziqokGoXuXR1eqm1' },
+  { id: 'm4a1-s-nightmare-ft',             name: 'M4A1-S',            skin: 'Nightmare',               wear: 'FT',  type: 'rifle',   rarity: 'clas',   price: 1163,    icon: 'i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL8ypexwjFS4_ega6F_H_OGMWrEwL9lj-9gSCGnmBw1tgKIn4vwNCaJaAJ1WZNwE-Rft0G8kIKyNui24lPcjoNFn3n3iCtMuHo447tWVfcjqbqX0V8N9uh_hA' },
+  { id: 'awp-crakow-ft',                   name: 'AWP',               skin: 'Crakow!',                 wear: 'FT',  type: 'awp',     rarity: 'clas',   price: 3168,    icon: 'i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLwiYbf_jdk4OSrerRsM-OsDXWRyuFhj-B-Xxa-kBkupjDLytqqdXnFZgUiAsZ3R7MDtxbskdblZO_htgGIg44RzHj5jXxPvCls6_FCD_RWJiXTXQ' },
+  { id: 'awp-wildfire-ww',                 name: 'AWP',               skin: 'Wildfire',                wear: 'WW',  type: 'awp',     rarity: 'cov',    price: 5835,    icon: 'i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLwiYbf_jdk7uW-V7NkLPSVB3WV_uNztOh8Qmflw0pysWWBy9n8Iy6fZg5xDJB2R-UKsEO_xobhYezg41Tf3t4XxH_5kGoXueNKmvzb' },
+  { id: 'usp-s-kill-confirmed-mw',         name: 'USP-S',             skin: 'Kill Confirmed',          wear: 'MW',  type: 'pistol',  rarity: 'cov',    price: 13700,   icon: 'i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLkjYbf7itX6vytbbZSI-WsG3SA_uV_vO1WTCa9kxQ1vjiBpYPwJiPTcFB2Xpp5TO5cskG9lYCxZu_jsVCL3o4Xnij23ClO5ik9tegFA_It8qHJz1aWe-uc160' },
+  { id: 'mac-10-neon-rider-ft',            name: 'MAC-10',            skin: 'Neon Rider',              wear: 'FT',  type: 'smg',     rarity: 'cov',    price: 16803,   icon: 'i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL8n5WxrR1Y-s2jaac8cM-dC2ie0-dytfNWQiy3nAgq_W-An9yvIi2WbgZzA5RwF-QL5BDumoC0NL_kswCK2YIQmymt2y0Y5nl1o7FV43jaksE' },
+  { id: 'ak-47-bloodsport-ww',             name: 'AK-47',             skin: 'Bloodsport',              wear: 'WW',  type: 'rifle',   rarity: 'cov',    price: 18400,   icon: 'i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLwlcK3wiVI0POlPPNSIvycAWOD0eFkpN5kSi26gBBpt2nXntmoeC3GbAEnDJQiROIIs0SxkdDgMOLm7lGN2YgWnyX23HtOvzErvbh31ioYgg' },
+  { id: 'falchion-knife-case-hardened-fn', name: '★ Falchion Knife',  skin: 'Case Hardened',           wear: 'FN',  type: 'knife',   rarity: 'knife',  price: 49999,   icon: 'i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1d7v6tYK1iLs-SH1ifyOJztN5lRi67gVMi4z-Hz96tcSiUblcoA5tyTONZsxG4wdPjZLvg4Q3ej99Ezyr2jS1L8G81tJVww3hv' },
+  { id: 'huntsman-knife-ultraviolet-fn',   name: '★ Huntsman Knife',  skin: 'Ultraviolet',             wear: 'FN',  type: 'knife',   rarity: 'knife',  price: 59896,   icon: 'i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1P7vG6YadsLM-QG1iA1PxmvORWRzy9gQ4qsjO6lob-KT-JbFQlC5YhFrQN4xe4m4ezNL7g4QyLiItFyS772C5I7ilq6rpWUaYh-rqX0V82KISxGQ' },
+  { id: 'specialist-gloves-fade-mw',       name: '★ Specialist Gloves', skin: 'Fade',                    wear: 'MW',  type: 'gloves',  rarity: 'knife',  price: 72841,   icon: 'i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Tk71ruQBH4jYLf-i5U-fe9V7d9JfOaD2uZ0vpJtuBtSha_nBovp3PQy42sdX6eagIjW5AlQOVetBXuk92xNLvg4gOMjd5AmC2ointB53w__a9cBqntWBk3' },
+  { id: 'sport-gloves-amphibious-mw',      name: '★ Sport Gloves',    skin: 'Amphibious',              wear: 'MW',  type: 'gloves',  rarity: 'knife',  price: 91000,   icon: 'i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Tk5UvzWCL2kpn2-DFk_OKherB0H-CcB3Sfz9Fwou5ucCu_gBgYpDWMjorGLSLANkI-W5R4E7JZtxbskNWxZeLi4QPejdgTmSn62iwbvyw957kDAqog_fXWjBaBb-Pahe96zA' },
+  { id: 'desert-eagle-blaze-fn',           name: 'Desert Eagle',      skin: 'Blaze',                   wear: 'FN',  type: 'pistol',  rarity: 'res',    price: 94029,   icon: 'i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL1m5fn8Sdk7vORbqhsLfWAMWuZxuZi_uI_TX6wxxkjsGXXnImsJ37COlUoWcByEOMOtxa5kdXmNu3htVPZjN1bjXKpkHLRfQU' },
+  { id: 'driver-gloves-diamondback-mw',    name: '★ Driver Gloves',   skin: 'Diamondback',             wear: 'MW',  type: 'gloves',  rarity: 'knife',  price: 124899,  icon: 'i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5T441rsfhr9kYDl7h1I4_utY5t-LvGYC3SbyOBJqeRlQyakqhEutDWR1N77ICqXZw4iApJ1ReRb5Bi-k4fjYb7mtgPdgooXyyusiS9A7Shv674cEf1yI93CpRI' },
+  { id: 'butterfly-knife-damascus-steel-ww', name: '★ Butterfly Knife', skin: 'Damascus Steel',          wear: 'WW',  type: 'knife',   rarity: 'knife',  price: 150362,  icon: 'i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1Z-ua6bbZrLOmsD3avxe97sfJqWjqMzE0YvjiBk5r0b33CP1AoAsR3R7MPsESwkNTnZrjktgKM2otCn3-r3SJK6yxt4uxQWfI7uvqAJIKmAXA' },
+  { id: 'm9-bayonet-doppler-mw',           name: '★ M9 Bayonet',      skin: 'Doppler',                 wear: 'MW',  type: 'knife',   rarity: 'knife',  price: 168800,  icon: 'i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1Wts2sab1iLvWHMWad_up5oPFlSjuMhRUmoDjUpYPwJiPTcA8nCcZ1EOcDu0Lum9CzZO6w4Fbeg4wQxX392ykb6yc4troKAPIm-6fJz1aWPFsIQnE' },
+  { id: 'karambit-boreal-forest-fn',       name: '★ Karambit',        skin: 'Boreal Forest',           wear: 'FN',  type: 'knife',   rarity: 'knife',  price: 180000,  icon: 'i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1Q7uCvZaZkNM-bF1iWzvxzo_VWTSahkBwrjDGMnYftbyifZgQlA8EhRrRfuhm7lIa2MerjtlaKi4NGnius3SMc6Slv574AUPA7uvqA0RoB8ZE' },
 ];
 
 /* Стартовый инвентарь демо-аккаунта */
-const STARTER_INVENTORY = ['glock-water', 'mp9-storm', 'famas-roll', 'usp-cortex', 'nova-polar'];
+const STARTER_INVENTORY = ['nova-dark-sigil-mw', 'mp9-storm-bs', 'g3sg1-dream-glade-ww', 'galil-ar-rocket-pop-ft', 'm4a4-choppa-fn'];
 
 /* Ники для ленты живых апгрейдов */
 const NICKS = [
