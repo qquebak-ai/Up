@@ -616,10 +616,14 @@ img.art{aspect-ratio:3/2;object-fit:contain}
 .toast.err{border-left-color:var(--magenta)}
 @keyframes toastIn{from{opacity:0;transform:translateX(24px)}}
 
-.hdr,main,.foot{transform:translateY(var(--ptr,0px))}
-html.ptr-anim .hdr,html.ptr-anim main,html.ptr-anim .foot{transition:transform .24s ease}
+.hdr,main,.foot{transform:translate3d(0,var(--ptr,0px),0)}
+/* во время жеста блюр шапки отключается: он пересчитывается каждый кадр и тормозит сдвиг */
+html.is-pulling .hdr{backdrop-filter:none;-webkit-backdrop-filter:none;background:var(--void)}
+html.is-pulling .hdr,html.is-pulling main,html.is-pulling .foot{will-change:transform}
+html.is-pulling .fx{opacity:.5}
+html.ptr-anim .hdr,html.ptr-anim main,html.ptr-anim .foot{transition:transform .34s cubic-bezier(.22,.68,.3,1)}
 .ptr{
-  position:fixed;top:calc(12px + env(safe-area-inset-top));left:50%;z-index:70;
+  position:fixed;contain:layout paint;top:calc(12px + env(safe-area-inset-top));left:50%;z-index:70;
   transform:translate(-50%,-64px);opacity:0;pointer-events:none;
   transition:transform .22s ease,opacity .22s ease;
 }
