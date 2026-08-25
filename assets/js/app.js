@@ -465,6 +465,38 @@ function bind() {
   $$('main section[id]').forEach(s => obs.observe(s));
 }
 
+
+/* ---------- мобильные ограничения: без зума, только портрет ---------- */
+function mobileGuards() {
+  // iOS игнорирует user-scalable=no в meta, поэтому гасим жесты масштабирования вручную
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach(type =>
+    document.addEventListener(type, e => e.preventDefault(), { passive: false }));
+
+  // пинч двумя пальцами
+  document.addEventListener('touchmove', e => {
+    if (e.touches.length > 1) e.preventDefault();
+  }, { passive: false });
+
+  // двойной тап тоже масштабирует страницу; на кнопках и полях не мешаем
+  let lastTap = 0;
+  document.addEventListener('touchend', e => {
+    const now = Date.now();
+    const interactive = e.target.closest('button, a, input, select, textarea, summary, [data-open], .card');
+    if (now - lastTap < 350 && !interactive) e.preventDefault();
+    lastTap = now;
+  }, { passive: false });
+
+  // блокировка ориентации доступна только в установленном/полноэкранном режиме
+  const lockPortrait = () => {
+    try {
+      const r = screen.orientation && screen.orientation.lock && screen.orientation.lock('portrait');
+      if (r && typeof r.catch === 'function') r.catch(() => {});
+    } catch (e) { /* браузер не поддерживает — работает CSS-заглушка .rotate */ }
+  };
+  lockPortrait();
+  document.addEventListener('fullscreenchange', lockPortrait);
+}
+
 /* ---------- запуск ---------- */
 function init() {
   load();
@@ -476,6 +508,7 @@ function init() {
   renderInv();
   renderUpgrader();
   bind();
+  mobileGuards();
   counters();
   for (let i = 0; i < 8; i++) fakeFeed();
   setInterval(fakeFeed, 4200);

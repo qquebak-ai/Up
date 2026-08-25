@@ -2,10 +2,14 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>UPGRADER — апгрейд скинов CS2 | Демо-режим</title>
 <meta name="description" content="Апгрейдер скинов CS2: выберите свой предмет, укажите желаемый и крутите барабан. Демонстрационный проект на виртуальной валюте.">
 <meta name="theme-color" content="#0a0c13">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -39,7 +43,7 @@
         <svg viewBox="0 0 24 24" class="coin" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h5M9.5 14.5h5" fill="none" stroke="#0a0c13" stroke-width="1.8" stroke-linecap="round"/></svg>
         <span id="balance">0</span>
       </div>
-      <button class="btn btn--ghost" id="topup">Пополнить</button>
+      <button class="btn btn--ghost" id="topup" aria-label="Пополнить баланс">Пополнить</button>
       <button class="btn btn--primary" id="login">Войти через Steam</button>
       <button class="burger" id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
     </div>
@@ -286,6 +290,19 @@
       <button class="btn btn--ghost" id="result-sell">Продать</button>
       <button class="btn btn--primary" id="result-keep">В инвентарь</button>
     </div>
+  </div>
+</div>
+
+<!-- ================= ТОЛЬКО ПОРТРЕТ ================= -->
+<div class="rotate" id="rotate" aria-hidden="true">
+  <div class="rotate__box">
+    <svg viewBox="0 0 64 64" class="rotate__icon" aria-hidden="true">
+      <rect x="20" y="6" width="24" height="42" rx="4"/>
+      <path d="M14 52a20 20 0 0 0 36 0" fill="none" stroke-linecap="round"/>
+      <path d="M50 46v8h-8"/>
+    </svg>
+    <div class="rotate__title">Поверните телефон</div>
+    <p>Сайт рассчитан на вертикальную ориентацию экрана.</p>
   </div>
 </div>
 

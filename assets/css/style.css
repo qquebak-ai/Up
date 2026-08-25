@@ -20,6 +20,11 @@
 
 *{box-sizing:border-box}
 [hidden]{display:none!important}
+html{
+  -webkit-text-size-adjust:100%;text-size-adjust:100%;
+  overflow-x:hidden;overscroll-behavior:none;
+  touch-action:pan-y;                       /* только вертикальный скролл, без пинч-зума */
+}
 html{scroll-behavior:smooth}
 body{
   margin:0;
@@ -28,7 +33,14 @@ body{
   font:400 16px/1.55 Manrope,-apple-system,Segoe UI,Roboto,sans-serif;
   -webkit-font-smoothing:antialiased;
   overflow-x:hidden;
+  max-width:100%;
+  touch-action:pan-y;
+  -webkit-tap-highlight-color:transparent;
+  padding-bottom:env(safe-area-inset-bottom);
 }
+/* контейнеры с собственной горизонтальной прокруткой */
+.feed__row{touch-action:pan-x}
+.grid--modal{touch-action:pan-y}
 img,svg{display:block;max-width:100%}
 a{color:inherit;text-decoration:none}
 button,input,select{font:inherit;color:inherit}
@@ -68,15 +80,21 @@ h1,h2,h3,h4{margin:0;line-height:1.15;letter-spacing:-.02em}
   background:rgba(10,12,19,.82);
   backdrop-filter:blur(14px);
   border-bottom:1px solid var(--line);
+  padding-left:env(safe-area-inset-left);
+  padding-right:env(safe-area-inset-right);
 }
-.header__in{display:flex;align-items:center;gap:22px;height:70px}
-.logo{display:flex;align-items:center;gap:10px;flex:none}
+@media (display-mode:standalone){
+  .header{padding-top:env(safe-area-inset-top)}
+}
+.promo{padding-left:calc(16px + env(safe-area-inset-left));padding-right:calc(16px + env(safe-area-inset-right))}
+.header__in{display:flex;align-items:center;gap:22px;height:70px;min-width:0}
+.logo{display:flex;align-items:center;gap:10px;flex:none;min-width:0}
 .logo__mark{
   width:36px;height:36px;border-radius:11px;display:grid;place-items:center;
   background:linear-gradient(135deg,var(--violet),#3ee0c0);
   font-weight:800;font-size:14px;color:#0a0c13;letter-spacing:-.03em;
 }
-.logo__text{font-weight:800;letter-spacing:-.03em;font-size:18px}
+.logo__text{font-weight:800;letter-spacing:-.03em;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .logo__text em{font-style:normal;color:var(--violet-2);font-weight:600}
 
 .nav{display:flex;gap:4px;margin-left:8px}
@@ -87,7 +105,7 @@ h1,h2,h3,h4{margin:0;line-height:1.15;letter-spacing:-.02em}
 .nav a:hover{color:var(--txt);background:rgba(255,255,255,.05)}
 .nav a.is-active{color:#fff;background:rgba(123,92,250,.18)}
 
-.header__right{display:flex;align-items:center;gap:10px;margin-left:auto}
+.header__right{display:flex;align-items:center;gap:10px;margin-left:auto;min-width:0}
 .balance{
   display:flex;align-items:center;gap:8px;
   background:var(--panel);border:1px solid var(--line-2);
@@ -307,7 +325,7 @@ h1,h2,h3,h4{margin:0;line-height:1.15;letter-spacing:-.02em}
 .fair code{
   display:inline-block;background:rgba(0,0,0,.4);border:1px solid var(--line-2);
   border-radius:10px;padding:11px 16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
-  font-size:14px;color:var(--green);
+  font-size:14px;color:var(--green);max-width:100%;overflow-wrap:anywhere;
 }
 .fair__note{margin:12px 0 0;font-size:13px}
 
@@ -376,7 +394,7 @@ h1,h2,h3,h4{margin:0;line-height:1.15;letter-spacing:-.02em}
 .result__actions .btn{flex:1}
 
 /* ============ тосты ============ */
-.toasts{position:fixed;right:16px;bottom:16px;z-index:95;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.toasts{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:95;display:flex;flex-direction:column;gap:8px;pointer-events:none}
 .toast{
   background:var(--panel-2);border:1px solid var(--line-2);border-left:3px solid var(--violet);
   border-radius:12px;padding:12px 16px;font-size:14px;font-weight:600;
@@ -403,9 +421,18 @@ h1,h2,h3,h4{margin:0;line-height:1.15;letter-spacing:-.02em}
 }
 @media (max-width:640px){
   .section{padding:52px 0}
-  .header__in{gap:12px}
-  .balance{padding:7px 11px;font-size:14px}
+  .wrap{width:min(1240px,100% - 24px)}
+  .header__in{gap:8px;height:62px}
+  .logo__mark{width:32px;height:32px;border-radius:9px;font-size:13px}
+  .logo__text{font-size:16px}
+  .logo__text em{display:none}
+  .balance{padding:7px 10px;font-size:13.5px;gap:6px;flex:none}
   #login{display:none}
+  /* «Пополнить» ужимается до плюса, чтобы строка влезала в 360px */
+  #topup{padding:9px 13px;font-size:0;flex:none}
+  #topup::before{content:'+';font-size:19px;font-weight:800;line-height:1}
+  .burger{width:38px;height:36px;flex:none}
+  .promo{font-size:12px;padding:8px 14px}
   .filters{width:100%}
   .filters input,.filters select{flex:1;min-width:0}
   .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
@@ -413,4 +440,26 @@ h1,h2,h3,h4{margin:0;line-height:1.15;letter-spacing:-.02em}
   .btn--go{width:100%;padding:16px}
   .footer__in{grid-template-columns:1fr}
   .stats li{min-width:0;flex:1;padding:10px 14px}
+  .footer__bottom{flex-direction:column;gap:6px}
+  .modal__box{padding:16px;border-radius:16px}
+  .grid--modal{max-height:60vh}
+}
+@media (max-width:380px){
+  .logo__text{display:none}
+  .stats{gap:8px}
+  .feed__item{width:165px}
+}
+
+/* ============ только портретная ориентация ============ */
+.rotate{display:none}
+@media (orientation:landscape) and (max-height:520px){
+  .rotate{
+    position:fixed;inset:0;z-index:200;display:grid;place-items:center;
+    background:var(--bg);padding:24px;text-align:center;
+  }
+  .rotate__box{max-width:340px}
+  .rotate__icon{width:64px;height:64px;margin:0 auto 16px;fill:var(--violet-2);stroke:var(--violet-2);stroke-width:3}
+  .rotate__title{font-size:20px;font-weight:800}
+  .rotate__box p{color:var(--muted);font-size:14px;margin:8px 0 0}
+  body{overflow:hidden}
 }
