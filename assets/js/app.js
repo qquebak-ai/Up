@@ -255,7 +255,7 @@ function applyPreset(pct) {
 /* ---------- частицы вокруг ядра ---------- */
 function coreParticles() {
   const cv = $('#core-canvas');
-  if (!cv || calm()) return { run() {}, burst() {}, calm() {} };
+  if (!cv || calm()) return { run() {}, burst() {}, calm() {}, pause() {}, resume() {} };
   const ctx = cv.getContext('2d');
   let w = 0, h = 0, mode = 'idle', until = 0;
   const parts = Array.from({ length: 64 }, () => ({
@@ -277,7 +277,9 @@ function coreParticles() {
   resize();
   addEventListener('resize', resize);
 
+  let raf = 0, alive = true;
   const frame = () => {
+    if (!alive) { raf = 0; return; }
     ctx.clearRect(0, 0, w, h);
     const cx = w / 2, cy = h / 2, k = Math.min(w, h) / 260;
     const boost = mode === 'run' ? 4.2 : 1;
@@ -295,17 +297,19 @@ function coreParticles() {
       ctx.fill();
     }
     ctx.globalAlpha = 1;
-    requestAnimationFrame(frame);
+    raf = requestAnimationFrame(frame);
   };
-  requestAnimationFrame(frame);
+  raf = requestAnimationFrame(frame);
 
   return {
+    pause() { alive = false; if (raf) cancelAnimationFrame(raf); raf = 0; ctx.clearRect(0, 0, w, h); },
+    resume() { if (!alive) { alive = true; raf = requestAnimationFrame(frame); } },
     run() { mode = 'run'; },
     calm() { mode = 'idle'; },
     burst() { mode = 'burst'; until = performance.now() + 900; setTimeout(() => { mode = 'idle'; parts.forEach(p => { p.r = 34 + Math.random() * 78; }); }, 950); },
   };
 }
-let particles = { run() {}, burst() {}, calm() {} };
+let particles = { run() {}, burst() {}, calm() {}, pause() {}, resume() {} };
 
 /* ---------- запуск ядра ---------- */
 function forge() {
@@ -612,25 +616,41 @@ function pullToRefresh() {
   const free = id => { const n = $(id); return !n || n.hidden; };
   const blocked = () => busy || !free('#modal') || !free('#result') || running;
 
-  const move = (px, drag) => {
+  let frame = 0, pending = null;
+  const paint = () => {
+    frame = 0;
+    if (!pending) return;
+    const { px, drag } = pending;
+    pending = null;
     el.classList.toggle('is-drag', drag);
     root.classList.toggle('ptr-anim', !drag);
-    root.style.setProperty('--ptr', `${px}px`);
-    el.style.transform = `translate(-50%, ${Math.min(px, 64) - 64}px)`;
+    root.style.setProperty('--ptr', `${px.toFixed(1)}px`);
+    el.style.transform = `translate3d(-50%, ${(Math.min(px, 64) - 64).toFixed(1)}px, 0)`;
     el.style.opacity = px > 8 ? '1' : '0';
+  };
+  /* одна запись стилей на кадр: на каждом touchmove браузер иначе не успевает */
+  const move = (px, drag) => {
+    pending = { px, drag };
+    if (!frame) frame = requestAnimationFrame(paint);
   };
   const reset = () => {
     tracking = false; ready = false; dist = 0;
+    pending = null;
+    if (frame) { cancelAnimationFrame(frame); frame = 0; }
     el.classList.remove('is-drag', 'is-ready');
+    root.classList.remove('is-pulling');
     root.classList.add('ptr-anim');
     root.style.setProperty('--ptr', '0px');
     el.style.transform = ''; el.style.opacity = '';
+    particles.resume();
   };
 
   document.addEventListener('touchstart', e => {
     if (blocked() || e.touches.length !== 1 || !atTop()) return;
     startY = e.touches[0].clientY; startX = e.touches[0].clientX;
     tracking = true; dist = 0;
+    root.classList.add('is-pulling');
+    particles.pause();
   }, { passive: true });
 
   document.addEventListener('touchmove', e => {
@@ -652,7 +672,7 @@ function pullToRefresh() {
       el.classList.remove('is-drag', 'is-ready');
       el.classList.add('is-load');
       move(56, false);
-      setTimeout(() => location.reload(), 320);
+      setTimeout(() => location.reload(), 360);
       return;
     }
     reset();
