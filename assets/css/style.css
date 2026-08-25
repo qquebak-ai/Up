@@ -417,14 +417,16 @@ html.ptr-anim main,html.ptr-anim .footer{transition:transform .24s ease}
   width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
   background:var(--panel-2);border:1px solid var(--line-2);box-shadow:var(--shadow);
 }
-.ptr__arrow{
-  width:22px;height:22px;fill:none;stroke:var(--violet-2);
+.ptr__arrow,.ptr__spin{
+  grid-area:1/1;width:22px;height:22px;fill:none;
   stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;
-  transition:transform .18s ease;
 }
+.ptr__arrow{stroke:var(--violet-2);transition:transform .18s ease}
 .ptr.is-ready .ptr__arrow{transform:rotate(180deg);stroke:var(--green)}
-.ptr.is-load .ptr__circle{animation:ptrSpin .8s linear infinite}
-.ptr.is-load .ptr__arrow{opacity:.35}
+/* в состоянии загрузки крутится дуга, а не стрелка вокруг центра */
+.ptr__spin{stroke:var(--green);opacity:0}
+.ptr.is-load .ptr__arrow{opacity:0}
+.ptr.is-load .ptr__spin{opacity:1;animation:ptrSpin .7s linear infinite}
 @keyframes ptrSpin{to{transform:rotate(360deg)}}
 
 /* ============ тосты ============ */
