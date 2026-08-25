@@ -20,7 +20,7 @@ const money = cents => '$' + (cents / 100).toLocaleString('en-US',
   { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 /* ---------- состояние ---------- */
-let state = { balance: START_BALANCE, inv: [], uid: 1, sel: { from: null, to: null } };
+let state = { balance: START_BALANCE, inv: [], uid: 1, sel: { from: null, to: null, pct: null } };
 /* from — uid из инвентаря, to — id из каталога; хранится в state, чтобы выбор
    на странице магазина доехал до апгрейдера */
 let sel = state.sel;
@@ -38,7 +38,7 @@ function load() {
           balance: p.balance,
           inv: p.inv.filter(x => byId(x.id)),
           uid: p.uid || 1,
-          sel: { from: keep.from ?? null, to: byId(keep.to) ? keep.to : null },
+          sel: { from: keep.from ?? null, to: byId(keep.to) ? keep.to : null, pct: keep.pct ?? null },
         };
         sel = state.sel;
         if (!state.inv.some(x => x.uid === sel.from)) sel.from = null;
@@ -188,30 +188,33 @@ function renderUpgrader() {
     : !t ? 'Выберите желаемый предмет'
     : `Апгрейд ×${(t.price / f.price).toFixed(2)}`;
 
-  // подсветка активного множителя
-  const ratio = f && t ? t.price / f.price : null;
-  $$('#mults button').forEach(b => {
-    const m = parseFloat(b.dataset.m);
-    b.classList.toggle('is-on', ratio !== null && Math.abs(ratio - m) / m < 0.2);
-  });
+  // подсвечен тот пресет, который нажали: каталог редкий, точное попадание в 50% невозможно
+  $$('#chances button').forEach(b =>
+    b.classList.toggle('is-on', t !== null && sel.pct === Number(b.dataset.c)));
 }
 
-function renderMults() {
-  if (!$('#mults')) return;
-  $('#mults').innerHTML = MULTIPLIERS
-    .map(m => `<button data-m="${m}">×${m}</button>`).join('');
+function renderChances() {
+  if (!$('#chances')) return;
+  $('#chances').innerHTML = CHANCES
+    .map(c => `<button data-c="${c}"><b>${c}%</b><span>шанс</span></button>`).join('');
 }
 
-/* подобрать цель по множителю */
-function applyMult(m) {
+/* подобрать предмет под желаемый шанс: цена цели = цена вашей / шанс * комиссия */
+function applyChance(pct) {
   const f = fromItem();
   if (!f) { toast('Сначала выберите свой предмет', 'err'); return; }
-  const target = f.price * m;
-  const best = ITEMS.reduce((a, b) =>
-    Math.abs(b.price - target) < Math.abs(a.price - target) ? b : a);
+  const want = pct / 100;
+  const err = i => Math.abs(Math.min(MAX_CHANCE, f.price * HOUSE_EDGE / i.price) - want);
+  const best = ITEMS
+    .filter(i => i.price > f.price)                  // апгрейд, а не размен вниз
+    .reduce((a, b) => (!a || err(b) < err(a) ? b : a), null);
+  if (!best) { toast('Дороже этого предмета в каталоге ничего нет', 'err'); return; }
   sel.to = best.id;
+  sel.pct = pct;
   save();
   renderUpgrader();
+  const real = Math.round(chance() * 100);
+  if (Math.abs(real - pct) > 5) toast(`Ближайший предмет даёт ${real}% вместо ${pct}%`);
 }
 
 /* ---------- прокрут ---------- */
@@ -382,7 +385,7 @@ function bind() {
     const modalCard = e.target.closest('#modal-grid .card');
     if (modalCard) {
       if (modalMode === 'from') sel.from = Number(modalCard.dataset.uid);
-      else sel.to = modalCard.dataset.id;
+      else { sel.to = modalCard.dataset.id; sel.pct = null; }
       save();
       closeModal();
       renderUpgrader();
@@ -416,6 +419,7 @@ function bind() {
     const shopCard = e.target.closest('#shop-grid .card');
     if (shopCard) {
       sel.to = shopCard.dataset.id;
+      sel.pct = null;
       save();
       const item = byId(sel.to);
       if ($('#upgrade')) {
@@ -438,9 +442,9 @@ function bind() {
       return;
     }
 
-    // множители
-    const mult = e.target.closest('#mults button');
-    if (mult) { applyMult(parseFloat(mult.dataset.m)); return; }
+    // пресеты желаемого шанса
+    const ch = e.target.closest('#chances button');
+    if (ch) { applyChance(Number(ch.dataset.c)); return; }
 
     // фильтры по редкости
     const chip = e.target.closest('#chips button');
@@ -613,7 +617,7 @@ function init() {
   load();
   $('#year').textContent = new Date().getFullYear();
   renderChips();
-  renderMults();
+  renderChances();
   renderBalance();
   renderShop();
   renderInv();

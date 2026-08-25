@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=6">
+<link rel="stylesheet" href="assets/css/style.css?v=8">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>⚡</text></svg>">
 </head>
 <body>
@@ -72,7 +72,7 @@
   <div class="wrap">
     <div class="hero__head">
       <h1>Апгрейд скинов <span>CS2</span></h1>
-      <p>Обменяй недорогой предмет на дорогой. Чем выше множитель — тем меньше шанс. Всё честно и прозрачно.</p>
+      <p>Обменяй недорогой предмет на дорогой. Выбери желаемый шанс — чем он ниже, тем дороже предмет на выходе. Всё честно и прозрачно.</p>
       <ul class="stats">
         <li><b id="stat-online">0</b><span>игроков онлайн</span></li>
         <li><b id="stat-upg">0</b><span>апгрейдов за сутки</span></li>
@@ -82,18 +82,6 @@
 
     <div class="upgrader">
       <div class="upgrader__grid">
-
-        <!-- Свой предмет -->
-        <div class="slot" id="slot-from">
-          <div class="slot__label">Ваш предмет</div>
-          <div class="slot__body" id="from-body">
-            <button class="slot__empty" data-open="from">
-              <span class="plus">+</span>
-              Выбрать из инвентаря
-            </button>
-          </div>
-          <button class="slot__action" data-open="from">Изменить</button>
-        </div>
 
         <!-- Барабан -->
         <div class="wheel">
@@ -112,21 +100,40 @@
           </div>
         </div>
 
-        <!-- Желаемый предмет -->
-        <div class="slot" id="slot-to">
-          <div class="slot__label">Желаемый предмет</div>
-          <div class="slot__body" id="to-body">
-            <button class="slot__empty" data-open="to">
-              <span class="plus">+</span>
-              Выбрать из магазина
-            </button>
+        <!-- Желаемый шанс -->
+        <div class="chances" id="chances" role="group" aria-label="Желаемый шанс апгрейда"></div>
+
+        <!-- Предметы в одну строку -->
+        <div class="slots">
+          <div class="slot" id="slot-from">
+            <div class="slot__label">Ваш предмет</div>
+            <div class="slot__body" id="from-body">
+              <button class="slot__empty" data-open="from">
+                <span class="plus">+</span>
+                Выбрать из инвентаря
+              </button>
+            </div>
+            <button class="slot__action" data-open="from">Изменить</button>
           </div>
-          <button class="slot__action" data-open="to">Изменить</button>
+
+          <div class="slots__arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+          </div>
+
+          <div class="slot" id="slot-to">
+            <div class="slot__label">Получите</div>
+            <div class="slot__body" id="to-body">
+              <button class="slot__empty" data-open="to">
+                <span class="plus">+</span>
+                Выбрать из магазина
+              </button>
+            </div>
+            <button class="slot__action" data-open="to">Изменить</button>
+          </div>
         </div>
       </div>
 
       <div class="upgrader__controls">
-        <div class="mults" id="mults"></div>
         <button class="btn btn--go" id="go" disabled>Выберите предметы</button>
         <div class="upgrader__meta">
           <span>Ставка: <b id="meta-bet">—</b></span>
@@ -185,7 +192,7 @@
       <article class="step">
         <div class="step__n">02</div>
         <h3>Укажите цель</h3>
-        <p>Выберите желаемый скин или задайте множитель — от ×1.5 до ×20. Шанс пересчитывается сразу.</p>
+        <p>Нажмите 75%, 50% или 35% — под выбранный шанс подберётся предмет подходящей цены. Любую другую цель можно взять в магазине.</p>
       </article>
       <article class="step">
         <div class="step__n">03</div>
@@ -314,8 +321,8 @@
 
 <div class="toasts" id="toasts"></div>
 
-<script src="assets/js/data.js?v=6"></script>
-<script src="assets/js/weapons.js?v=6"></script>
-<script src="assets/js/app.js?v=6"></script>
+<script src="assets/js/data.js?v=8"></script>
+<script src="assets/js/weapons.js?v=8"></script>
+<script src="assets/js/app.js?v=8"></script>
 </body>
 </html>
