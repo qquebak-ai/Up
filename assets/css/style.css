@@ -199,16 +199,20 @@ main,.hdr,.foot,.tabbar{position:relative;z-index:1}
 .rig::before{top:22px;left:-14px;transform:rotate(90deg)}
 .rig::after{bottom:22px;right:-14px;transform:rotate(90deg)}
 
-.stage{
-  display:grid;gap:26px;align-items:center;
-  grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
-  grid-template-areas:
-    ".  chance ."
-    "in core   out";
+/* ядро сверху, под ним проценты, ещё ниже приёмники в одну строку */
+.stage{display:flex;flex-direction:column;align-items:center;gap:22px}
+.bays{
+  display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  gap:16px;align-items:stretch;width:100%;
+}
+.bays__arrow{display:grid;place-items:center;color:var(--cyan)}
+.bays__arrow svg{
+  width:30px;height:30px;fill:none;stroke:currentColor;
+  stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+  filter:drop-shadow(0 0 8px rgba(32,230,255,.55));
 }
 
-/* шанс над ядром */
-.chance{grid-area:chance;text-align:center;min-width:260px}
+.chance{text-align:center;min-width:260px}
 .chance__val{
   font-size:clamp(44px,5.4vw,64px);font-weight:800;letter-spacing:-.045em;line-height:1;
   font-variant-numeric:tabular-nums;
@@ -228,7 +232,7 @@ main,.hdr,.foot,.tabbar{position:relative;z-index:1}
 
 /* ---------- ядро ---------- */
 .core{
-  grid-area:core;position:relative;
+  position:relative;
   width:clamp(240px,26vw,330px);aspect-ratio:1;display:grid;place-items:center;
 }
 .core__canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0}
@@ -282,8 +286,6 @@ main,.hdr,.foot,.tabbar{position:relative;z-index:1}
   padding:16px;min-height:280px;display:flex;flex-direction:column;gap:12px;
   transition:.22s border-color,.22s box-shadow;
 }
-.bay--in{grid-area:in}
-.bay--out{grid-area:out}
 .bay.is-set{border-color:var(--line-3);box-shadow:0 0 0 1px rgba(32,230,255,.07) inset,0 18px 50px -34px var(--cyan)}
 .bay__hd{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .bay__body{flex:1;display:grid;place-items:center}
@@ -668,12 +670,11 @@ html.ptr-anim .promo,html.ptr-anim .hdr,html.ptr-anim main,html.ptr-anim .foot{t
   .foot__in{grid-template-columns:1fr 1fr}
 }
 @media (max-width:960px){
-  .stage{
-    grid-template-columns:1fr;
-    grid-template-areas:"in" "core" "chance" "out";
-    justify-items:center;gap:18px;
-  }
-  .bay{width:100%;min-height:auto}
+  .stage{gap:18px}
+  .bay{width:100%;min-height:auto;padding:13px}
+  .bays{gap:9px}
+  .bays__arrow svg{width:22px;height:22px}
+  .bay__pick{min-height:150px}
   .core{width:min(300px,80vw)}
   .chance{min-width:0}
   .rig{padding:20px}

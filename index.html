@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=10">
+<link rel="stylesheet" href="assets/css/style.css?v=11">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>◈</text></svg>">
 </head>
 <body id="top">
@@ -91,12 +91,6 @@
           <div class="chance__scale"><i id="chance-scale"></i></div>
         </div>
 
-        <div class="bay bay--in" id="bay-from">
-          <div class="bay__hd"><span class="tag">INPUT / ВАШ ПРЕДМЕТ</span><span class="tag tag--cyan">A</span></div>
-          <div class="bay__body" id="from-body"></div>
-          <button class="bay__act" data-open="from">SELECT FROM INVENTORY</button>
-        </div>
-
         <div class="core" id="core">
           <canvas class="core__canvas" id="core-canvas" aria-hidden="true"></canvas>
           <svg class="core__svg" viewBox="0 0 260 260" aria-hidden="true">
@@ -132,10 +126,24 @@
           <div class="core__heart"><b id="core-state">STANDBY</b></div>
         </div>
 
-        <div class="bay bay--out" id="bay-to">
-          <div class="bay__hd"><span class="tag">OUTPUT / ПОЛУЧИТЕ</span><span class="tag tag--lime">B</span></div>
-          <div class="bay__body" id="to-body"></div>
-          <button class="bay__act" data-open="to">SELECT FROM MARKET</button>
+        <div class="presets" id="presets" role="group" aria-label="Желаемый шанс"></div>
+
+        <div class="bays">
+          <div class="bay bay--in" id="bay-from">
+            <div class="bay__hd"><span class="tag">INPUT / ВАШ ПРЕДМЕТ</span><span class="tag tag--cyan">A</span></div>
+            <div class="bay__body" id="from-body"></div>
+            <button class="bay__act" data-open="from">SELECT FROM INVENTORY</button>
+          </div>
+
+          <div class="bays__arrow" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
+          </div>
+
+          <div class="bay bay--out" id="bay-to">
+            <div class="bay__hd"><span class="tag">OUTPUT / ПОЛУЧИТЕ</span><span class="tag tag--lime">B</span></div>
+            <div class="bay__body" id="to-body"></div>
+            <button class="bay__act" data-open="to">SELECT FROM MARKET</button>
+          </div>
         </div>
       </div>
 
@@ -147,8 +155,6 @@
           <li data-p="resonance">RESONANCE</li>
           <li data-p="result">RESULT</li>
         </ul>
-
-        <div class="presets" id="presets" role="group" aria-label="Желаемый шанс"></div>
 
         <button class="forge-btn" id="forge-btn" disabled>
           <span class="forge-btn__body">
@@ -388,8 +394,8 @@
 
 <div class="toasts" id="toasts"></div>
 
-<script src="assets/js/data.js?v=10"></script>
-<script src="assets/js/weapons.js?v=10"></script>
-<script src="assets/js/app.js?v=10"></script>
+<script src="assets/js/data.js?v=11"></script>
+<script src="assets/js/weapons.js?v=11"></script>
+<script src="assets/js/app.js?v=11"></script>
 </body>
 </html>
