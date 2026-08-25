@@ -5,11 +5,11 @@
 
 /* Палитра NEON FORGE: сталь → cyan → violet → magenta → lime */
 const RARITY = {
-  mil:    { name: 'STANDARD',  color: '#5b7590' },
-  res:    { name: 'ENHANCED',  color: '#20e6ff' },
-  clas:   { name: 'CLASSIFIED', color: '#8b5cf6' },
-  cov:    { name: 'COVERT',    color: '#ff3d8b' },
-  knife:  { name: 'EXOTIC',    color: '#b8ff3d' },
+  mil:    { name: 'Обычное',       color: '#5b7590' },
+  res:    { name: 'Редкое',        color: '#20e6ff' },
+  clas:   { name: 'Очень редкое',  color: '#8b5cf6' },
+  cov:    { name: 'Тайное',        color: '#ff3d8b' },
+  knife:  { name: 'Нож и перчатки', color: '#b8ff3d' },
 };
 
 /* type — силуэт оружия на случай, если картинка не загрузится (см. weapons.js) */
