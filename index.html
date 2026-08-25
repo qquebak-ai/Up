@@ -12,8 +12,10 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=11">
+<link rel="stylesheet" media="print" onload="this.media='all'"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap"></noscript>
+<link rel="stylesheet" href="assets/css/style.css?v=12">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>◈</text></svg>">
 </head>
 <body id="top">
@@ -46,9 +48,9 @@
 
     <nav class="nav" id="nav">
       <a href="#forge" class="is-active">FORGE</a>
-      <a href="#battles">BATTLES</a>
-      <a href="#contracts" data-soon>CONTRACTS</a>
-      <a href="#inventory">INVENTORY</a>
+      <a href="battles.html">BATTLES</a>
+      <a href="contracts.html" data-soon>CONTRACTS</a>
+      <a href="inventory.html">INVENTORY</a>
       <a href="market.html">MARKET</a>
     </nav>
 
@@ -61,8 +63,8 @@
         <svg viewBox="0 0 24 24"><path d="M12 3v18M8 7h6a3 3 0 0 1 0 6H9a3 3 0 0 0 0 6h7"/></svg>
         <b id="balance">$0.00</b>
       </div>
-      <button class="btn btn--key" id="deposit" aria-label="Пополнить демо-баланс">DEPOSIT</button>
-      <span class="avatar" aria-hidden="true">QQ</span>
+      <button class="btn btn--key" data-deposit aria-label="Пополнить демо-баланс">DEPOSIT</button>
+      <a class="avatar" href="profile.html" title="Профиль оператора" aria-label="Профиль">QQ</a>
       <button class="burger" id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
     </div>
   </div>
@@ -175,148 +177,6 @@
   </div>
 </section>
 
-<!-- ==================== RECENT + LIVE ==================== -->
-<section class="sec" id="recent-sec">
-  <div class="wrap">
-    <div class="split">
-      <div>
-        <div class="sec__head">
-          <div>
-            <div class="tag tag--cyan">02 / TELEMETRY</div>
-            <h2 style="margin-top:10px">Recent Upgrades</h2>
-            <p>Последние запуски ядра — свои и чужие.</p>
-          </div>
-        </div>
-        <div class="rail" id="recent"></div>
-      </div>
-
-      <aside class="live">
-        <div class="live__hd"><span class="live__dot"></span><span class="tag tag--lime">LIVE ACTIVITY</span></div>
-        <div class="live__list" id="live-list"></div>
-      </aside>
-    </div>
-  </div>
-</section>
-
-<!-- ==================== POPULAR ==================== -->
-<section class="sec" id="popular-sec">
-  <div class="wrap">
-    <div class="sec__head">
-      <div>
-        <div class="tag tag--cyan">03 / ARSENAL</div>
-        <h2 style="margin-top:10px">Popular Skins</h2>
-        <p>Самые дорогие артефакты каталога. Клик ставит предмет целью апгрейда.</p>
-      </div>
-      <a class="btn" href="market.html">OPEN MARKET →</a>
-    </div>
-    <div class="grid" id="popular"></div>
-  </div>
-</section>
-
-<!-- ==================== BATTLES ==================== -->
-<section class="sec" id="battles">
-  <div class="wrap">
-    <div class="sec__head">
-      <div>
-        <div class="tag tag--cyan">04 / PVP</div>
-        <h2 style="margin-top:10px">Battles</h2>
-        <p>Режимы, где ядро работает сразу на нескольких операторов.</p>
-      </div>
-    </div>
-    <div class="modes">
-      <article class="mode">
-        <div class="mode__ico"><svg viewBox="0 0 24 24"><path d="M4 20 20 4M8 4H4v4M16 20h4v-4"/></svg></div>
-        <h3>Duel Forge</h3>
-        <p>Двое загружают предметы равной цены. Ядро выбирает одного — он забирает оба.</p>
-        <div class="mode__foot"><span class="mode__pill">1 V 1</span><span class="tag tag--lime">OPEN</span></div>
-      </article>
-      <article class="mode">
-        <div class="mode__ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4v16M4 12h16"/></svg></div>
-        <h3>Core Roulette</h3>
-        <p>До шести операторов на одно ядро. Чем дороже вклад, тем шире сектор.</p>
-        <div class="mode__foot"><span class="mode__pill">2 – 6</span><span class="tag tag--lime">OPEN</span></div>
-      </article>
-      <article class="mode mode--soon">
-        <div class="mode__ico"><svg viewBox="0 0 24 24"><path d="M12 3l7 4v10l-7 4-7-4V7z"/><path d="M12 12v9M12 12 5 7M12 12l7-5"/></svg></div>
-        <h3>Cascade</h3>
-        <p>Серия из пяти апгрейдов подряд: каждый выигрыш автоматически идёт в следующий запуск.</p>
-        <div class="mode__foot"><span class="mode__pill">SOLO</span><span class="tag">SOON</span></div>
-      </article>
-    </div>
-  </div>
-</section>
-
-<!-- ==================== CONTRACTS ==================== -->
-<section class="sec" id="contracts">
-  <div class="wrap">
-    <div class="sec__head">
-      <div>
-        <div class="tag tag--cyan">05 / CONTRACTS</div>
-        <h2 style="margin-top:10px">Contracts</h2>
-        <p>Сборка десяти предметов одного класса в один следующего уровня.</p>
-      </div>
-    </div>
-    <div class="modes">
-      <article class="mode mode--soon">
-        <div class="mode__ico"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7"/></svg></div>
-        <h3>Trade-Up Protocol</h3>
-        <p>10 × STANDARD → 1 × ENHANCED. Класс результата фиксирован, конкретный предмет — нет.</p>
-        <div class="mode__foot"><span class="mode__pill">10 → 1</span><span class="tag">SOON</span></div>
-      </article>
-      <article class="mode mode--soon">
-        <div class="mode__ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
-        <h3>Daily Directive</h3>
-        <p>Ежедневное задание ядра: провести серию запусков и получить бонус к балансу.</p>
-        <div class="mode__foot"><span class="mode__pill">24 H</span><span class="tag">SOON</span></div>
-      </article>
-      <article class="mode mode--soon">
-        <div class="mode__ico"><svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.6L21 9.5l-4.5 4.3 1.1 6.2L12 17l-5.6 3 1.1-6.2L3 9.5l6.4-.9z"/></svg></div>
-        <h3>Prestige Reset</h3>
-        <p>Обнуление Forge Level в обмен на постоянный бонус к шансу. Требует уровня 30.</p>
-        <div class="mode__foot"><span class="mode__pill">LVL 30</span><span class="tag">SOON</span></div>
-      </article>
-    </div>
-  </div>
-</section>
-
-<!-- ==================== INVENTORY ==================== -->
-<section class="sec" id="inventory">
-  <div class="wrap">
-    <div class="sec__head">
-      <div>
-        <div class="tag tag--cyan">06 / STORAGE</div>
-        <h2 style="margin-top:10px">Inventory <span id="inv-count" style="color:var(--cyan)">0</span></h2>
-        <p>Оценка склада: <b id="inv-sum" style="color:var(--lime);font-family:var(--mono)">$0.00</b></p>
-      </div>
-      <button class="btn" id="sell-all">LIQUIDATE ALL</button>
-    </div>
-    <div class="grid" id="inv-grid"></div>
-  </div>
-</section>
-
-<!-- ==================== PROTOCOL ==================== -->
-<section class="sec" id="protocol">
-  <div class="wrap">
-    <div class="sec__head">
-      <div>
-        <div class="tag tag--cyan">07 / PROTOCOL</div>
-        <h2 style="margin-top:10px">Как считает ядро</h2>
-      </div>
-    </div>
-    <div class="proto">
-      <div class="proto__b"><div class="tag tag--cyan">STEP 01</div><h3>Загрузка</h3><p>Предмет из инвентаря отправляется в приёмник A. Его цена — ставка запуска.</p></div>
-      <div class="proto__b"><div class="tag tag--cyan">STEP 02</div><h3>Цель</h3><p>Пресет шанса подбирает предмет нужной цены, либо цель выбирается вручную в маркете.</p></div>
-      <div class="proto__b"><div class="tag tag--cyan">STEP 03</div><h3>Запуск</h3><p>Ядро проходит фазы SCANNING → CALCULATING → FORGING → RESONANCE и фиксирует результат.</p></div>
-      <div class="proto__b"><div class="tag tag--cyan">STEP 04</div><h3>Исход</h3><p>Успех — предмет собирается в приёмнике B. Провал — ядро схлопывается, ставка сгорает.</p></div>
-    </div>
-    <div class="formula">
-      <div class="tag tag--lime">PROBABILITY FORMULA</div>
-      <code>chance = (цена входа / цена цели) × 0.92 · предел 1…92%</code>
-      <p>Комиссия площадки — 8%, она заложена в формулу открыто. Исход определяется псевдослучайным числом в момент запуска: ожидаемая отдача 92% означает, что механика убыточна на дистанции.</p>
-    </div>
-  </div>
-</section>
-
 </main>
 
 <footer class="foot">
@@ -329,12 +189,12 @@
       <p>Демонстрационный интерфейс кузницы скинов. Названия, цены и изображения предметов — с витрины Steam Community Market и принадлежат Valve Corporation. Проект с ней не связан и не является азартной игрой на деньги.</p>
     </div>
     <div class="foot__c">
-      <h4 class="tag">SECTIONS</h4>
-      <a href="#forge">Forge</a><a href="#battles">Battles</a><a href="#inventory">Inventory</a><a href="market.html">Market</a>
+      <h4 class="tag">PAGES</h4>
+      <a href="index.html#forge">Forge</a><a href="battles.html">Battles</a><a href="inventory.html">Inventory</a><a href="market.html">Market</a><a href="profile.html">Profile</a>
     </div>
     <div class="foot__c">
       <h4 class="tag">PROTOCOL</h4>
-      <a href="#protocol">Формула шанса</a><a href="#protocol">Фазы запуска</a><a href="#contracts">Контракты</a>
+      <a href="protocol.html">Формула шанса</a><a href="protocol.html">Фазы запуска</a><a href="contracts.html">Контракты</a>
     </div>
     <div class="foot__c">
       <h4 class="tag">RESPONSIBLE PLAY</h4>
@@ -347,13 +207,6 @@
     <span>Counter-Strike 2 и скины — торговые марки Valve Corporation</span>
   </div>
 </footer>
-
-<nav class="tabbar" aria-label="Основная навигация">
-  <a href="#top"><svg viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v9H4z"/></svg>HOME</a>
-  <a href="#forge" class="is-active"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><path d="M12 5v14"/></svg>FORGE</a>
-  <a href="#battles"><svg viewBox="0 0 24 24"><path d="M4 20 20 4M8 4H4v4M16 20h4v-4"/></svg>BATTLES</a>
-  <a href="#inventory"><svg viewBox="0 0 24 24"><path d="M4 8h16v12H4z"/><path d="M9 8V5h6v3"/></svg>STORAGE</a>
-</nav>
 
 <div class="modal" id="modal" hidden>
   <div class="modal__bg" data-close></div>
@@ -394,8 +247,8 @@
 
 <div class="toasts" id="toasts"></div>
 
-<script src="assets/js/data.js?v=11"></script>
-<script src="assets/js/weapons.js?v=11"></script>
-<script src="assets/js/app.js?v=11"></script>
+<script src="assets/js/data.js?v=12"></script>
+<script src="assets/js/weapons.js?v=12"></script>
+<script src="assets/js/app.js?v=12"></script>
 </body>
 </html>

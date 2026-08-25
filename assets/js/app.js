@@ -26,7 +26,9 @@ const money = cents => '$' + (cents / 100).toLocaleString('en-US',
 const calm = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ---------- состояние ---------- */
-let state = { balance: START_BALANCE, inv: [], uid: 1, xp: 0, sel: { from: null, to: null, pct: null } };
+let state = { balance: START_BALANCE, inv: [], uid: 1, xp: 0,
+  stats: { runs: 0, wins: 0, bestId: null },
+  sel: { from: null, to: null, pct: null } };
 let sel = state.sel;
 let running = false;
 let modalMode = 'from';
@@ -36,11 +38,13 @@ function load() {
     const p = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
     if (p && typeof p.balance === 'number' && Array.isArray(p.inv)) {
       const keep = p.sel && typeof p.sel === 'object' ? p.sel : {};
+      const st = p.stats && typeof p.stats === 'object' ? p.stats : {};
       state = {
         balance: p.balance,
         inv: p.inv.filter(x => byId(x.id)),
         uid: p.uid || 1,
         xp: p.xp || 0,
+        stats: { runs: st.runs || 0, wins: st.wins || 0, bestId: byId(st.bestId) ? st.bestId : null },
         sel: { from: keep.from ?? null, to: byId(keep.to) ? keep.to : null, pct: keep.pct ?? null },
       };
       sel = state.sel;
@@ -125,6 +129,35 @@ function renderLevel() {
   // ядро наливается светом по мере роста уровня
   const core = $('#core');
   if (core) core.style.setProperty('--lvl', Math.min(1, level / 30).toFixed(2));
+}
+
+/* ---------- профиль ---------- */
+function renderProfile() {
+  if (!$('#pf-level')) return;
+  const { level, into, need } = levelInfo(state.xp);
+  const { runs, wins, bestId } = state.stats;
+  const best = byId(bestId);
+  const value = state.inv.reduce((s, x) => s + byId(x.id).price, 0);
+
+  $('#pf-level').textContent = level;
+  $('#pf-xp').textContent = `${into}/${need} XP`;
+  $('#pf-fill').style.width = `${Math.round(into / need * 100)}%`;
+  $('#pf-runs').textContent = runs;
+  $('#pf-wins').textContent = wins;
+  $('#pf-rate').textContent = runs ? `${Math.round(wins / runs * 100)}%` : '—';
+  $('#pf-best').textContent = best ? `${best.name} | ${best.skin}` : 'нет данных';
+  $('#pf-best-p').textContent = best ? money(best.price) : '—';
+  $('#pf-balance').textContent = money(state.balance);
+  $('#pf-items').textContent = state.inv.length;
+  $('#pf-value').textContent = money(value);
+
+  // реактор наливается светом по мере роста уровня
+  const reactor = $('#pf-reactor');
+  if (reactor) {
+    const seg = Math.min(12, Math.max(1, Math.round(level / 30 * 12) || 1));
+    reactor.innerHTML = Array.from({ length: 12 },
+      (_, i) => `<i class="${i < seg ? 'on' : ''}"></i>`).join('');
+  }
 }
 
 /* ---------- инвентарь и витрины ---------- */
@@ -334,6 +367,12 @@ function settle(win, f, t, core) {
   let wonUid = null;
   if (win) { wonUid = state.uid++; state.inv.push({ uid: wonUid, id: t.id }); }
   state.xp += win ? 3 : 1;
+  state.stats.runs++;
+  if (win) {
+    state.stats.wins++;
+    const best = byId(state.stats.bestId);
+    if (!best || t.price > best.price) state.stats.bestId = t.id;
+  }
   save();
 
   core.classList.remove('is-run');
@@ -347,7 +386,7 @@ function settle(win, f, t, core) {
 
   sel.from = null;
   running = false;
-  renderBalance(); renderLevel(); renderInv(); renderForge();
+  renderBalance(); renderLevel(); renderInv(); renderProfile(); renderForge();
   setTimeout(clearPhases, 2600);
 }
 
@@ -373,7 +412,7 @@ function closeResult(sell) {
       const item = byId(rec.id);
       state.inv = state.inv.filter(x => x.uid !== pendingWin);
       state.balance += item.price;
-      save(); renderBalance(); renderInv();
+      save(); renderBalance(); renderInv(); renderProfile();
       toast(`Продано за ${money(item.price)}`, 'ok');
     }
   }
@@ -495,14 +534,14 @@ function bind() {
         if (state.balance < item.price) { toast('Недостаточно средств на демо-балансе', 'err'); return; }
         state.balance -= item.price;
         state.inv.push({ uid: state.uid++, id: item.id });
-        save(); renderBalance(); renderInv();
+        save(); renderBalance(); renderInv(); renderProfile();
         toast(`${item.name} | ${item.skin} — в хранилище`, 'ok');
       } else {
         const uid = Number(card.dataset.uid);
         state.inv = state.inv.filter(x => x.uid !== uid);
         state.balance += item.price;
         if (sel.from === uid) sel.from = null;
-        save(); renderBalance(); renderInv(); renderForge();
+        save(); renderBalance(); renderInv(); renderProfile(); renderForge();
         toast(`Продано за ${money(item.price)}`, 'ok');
       }
       return;
@@ -542,6 +581,13 @@ function bind() {
       return;
     }
 
+    if (e.target.closest('[data-deposit]')) {
+      state.balance += START_BALANCE;
+      save(); renderBalance(); renderProfile();
+      toast(`Зачислено ${money(START_BALANCE)} демо-баланса`, 'ok');
+      return;
+    }
+
     if (e.target.closest('[data-close]')) closeModal();
   });
 
@@ -552,17 +598,12 @@ function bind() {
   on('#result-keep', 'click', () => closeResult(false));
   on('#result-sell', 'click', () => closeResult(true));
 
-  on('#deposit', 'click', () => {
-    state.balance += START_BALANCE;
-    save(); renderBalance();
-    toast(`Зачислено ${money(START_BALANCE)} демо-баланса`, 'ok');
-  });
 
   on('#sell-all', 'click', () => {
     if (!state.inv.length) { toast('Хранилище пусто', 'err'); return; }
     const sum = state.inv.reduce((s, x) => s + byId(x.id).price, 0);
     state.inv = []; sel.from = null; state.balance += sum;
-    save(); renderBalance(); renderInv(); renderForge();
+    save(); renderBalance(); renderInv(); renderProfile(); renderForge();
     toast(`Хранилище продано за ${money(sum)}`, 'ok');
   });
 
@@ -576,7 +617,7 @@ function bind() {
     if (r && !r.hidden) closeResult(false);
   });
 
-  const links = [...$$('#nav a'), ...$$('.tabbar a')].filter(a => a.getAttribute('href').startsWith('#'));
+  const links = $$('#nav a').filter(a => a.getAttribute('href').startsWith('#'));
   const sections = $$('main section[id]');
   if (!links.length || !sections.length) return;
   const obs = new IntersectionObserver(entries => {
@@ -689,6 +730,7 @@ function init() {
   renderBalance();
   renderLevel();
   renderInv();
+  renderProfile();
   renderPopular();
   renderForge();
   bind();
