@@ -603,53 +603,51 @@ function bind() {
 }
 
 /* ---------- обновление потягиванием ---------- */
-const PTR_TRIGGER = 70, PTR_MAX = 110, PTR_RESIST = 0.6;
+const PTR_REST = -48;      // спрятан за шапкой
+const PTR_MAX_Y = 110;     // ниже кружок не опускается
+const PTR_READY_Y = 52;    // порог срабатывания ≈ 111px движения пальца
+const PTR_RESIST = 0.9;
 
+/* Страница остаётся на месте: двигается только кружок. Так жест не заставляет
+   браузер перерисовывать шапку с её размытием и всё содержимое каждый кадр. */
 function pullToRefresh() {
   if (!('ontouchstart' in window)) return;
   const el = $('#ptr');
   if (!el) return;
-  const root = document.documentElement;
-  let startY = 0, startX = 0, dist = 0, tracking = false, ready = false, busy = false;
 
-  const atTop = () => (window.scrollY || root.scrollTop) <= 0;
+  let startY = 0, startX = 0, tracking = false, ready = false, busy = false;
+  let frame = 0, pending = null;
+
+  const atTop = () => (window.scrollY || document.documentElement.scrollTop) <= 0;
   const free = id => { const n = $(id); return !n || n.hidden; };
   const blocked = () => busy || !free('#modal') || !free('#result') || running;
 
-  let frame = 0, pending = null;
   const paint = () => {
     frame = 0;
     if (!pending) return;
-    const { px, drag } = pending;
+    const { y, spin, drag } = pending;
     pending = null;
     el.classList.toggle('is-drag', drag);
-    root.classList.toggle('ptr-anim', !drag);
-    root.style.setProperty('--ptr', `${px.toFixed(1)}px`);
-    el.style.transform = `translate3d(-50%, ${(Math.min(px, 64) - 64).toFixed(1)}px, 0)`;
-    el.style.opacity = px > 8 ? '1' : '0';
+    el.style.transform = `translate3d(-50%, ${y.toFixed(1)}px, 0) rotate(${spin.toFixed(1)}deg)`;
+    el.style.opacity = y > PTR_REST + 14 ? '1' : '0';
   };
-  /* одна запись стилей на кадр: на каждом touchmove браузер иначе не успевает */
-  const move = (px, drag) => {
-    pending = { px, drag };
-    if (!frame) frame = requestAnimationFrame(paint);
+  const move = (y, spin, drag) => {
+    pending = { y, spin, drag };
+    if (!frame) frame = requestAnimationFrame(paint);   // одна запись стилей на кадр
   };
   const reset = () => {
-    tracking = false; ready = false; dist = 0;
-    pending = null;
+    tracking = false; ready = false; pending = null;
     if (frame) { cancelAnimationFrame(frame); frame = 0; }
     el.classList.remove('is-drag', 'is-ready');
-    root.classList.remove('is-pulling');
-    root.classList.add('ptr-anim');
-    root.style.setProperty('--ptr', '0px');
     el.style.transform = ''; el.style.opacity = '';
     particles.resume();
   };
 
   document.addEventListener('touchstart', e => {
     if (blocked() || e.touches.length !== 1 || !atTop()) return;
-    startY = e.touches[0].clientY; startX = e.touches[0].clientX;
-    tracking = true; dist = 0;
-    root.classList.add('is-pulling');
+    startY = e.touches[0].clientY;
+    startX = e.touches[0].clientX;
+    tracking = true;
     particles.pause();
   }, { passive: true });
 
@@ -659,10 +657,10 @@ function pullToRefresh() {
     const dx = e.touches[0].clientX - startX;
     if (dy <= 0 || Math.abs(dx) > Math.abs(dy) || !atTop()) { reset(); return; }
     e.preventDefault();
-    dist = Math.min(dy * PTR_RESIST, PTR_MAX);
-    ready = dist >= PTR_TRIGGER;
+    const y = Math.min(PTR_MAX_Y, PTR_REST + dy * PTR_RESIST);
+    ready = y >= PTR_READY_Y;
     el.classList.toggle('is-ready', ready);
-    move(dist, true);
+    move(y, (y - PTR_REST) * 2.2, true);
   }, { passive: false });
 
   document.addEventListener('touchend', () => {
@@ -671,8 +669,8 @@ function pullToRefresh() {
       busy = true;
       el.classList.remove('is-drag', 'is-ready');
       el.classList.add('is-load');
-      move(56, false);
-      setTimeout(() => location.reload(), 360);
+      move(84, 0, false);
+      setTimeout(() => location.reload(), 420);
       return;
     }
     reset();
