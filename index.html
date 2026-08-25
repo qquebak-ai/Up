@@ -15,7 +15,7 @@
 <link rel="stylesheet" media="print" onload="this.media='all'"
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap"></noscript>
-<link rel="stylesheet" href="assets/css/style.css?v=16">
+<link rel="stylesheet" href="assets/css/style.css?v=17">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>◈</text></svg>">
 </head>
 <body id="top">
@@ -35,7 +35,6 @@
   </div>
 </div>
 
-<div class="promo">Демо-версия · баланс виртуальный · ставок и вывода нет · 18+</div>
 
 <header class="hdr">
   <div class="wrap hdr__in">
@@ -71,12 +70,6 @@
     <div class="rig">
       <div class="stage">
 
-        <div class="chance">
-          <div class="chance__val" id="chance">0.0<i>%</i></div>
-          <div class="tag chance__lbl" id="chance-label">Шанс успеха</div>
-          <div class="chance__scale"><i id="chance-scale"></i></div>
-        </div>
-
         <div class="core" id="core">
           <canvas class="core__canvas" id="core-canvas" aria-hidden="true"></canvas>
           <svg class="core__svg" viewBox="0 0 260 260" aria-hidden="true">
@@ -109,7 +102,9 @@
             </g>
           </svg>
           <div class="core__pulse"></div>
-          <div class="core__heart"><b id="core-state">готов</b></div>
+          <div class="core__heart">
+            <div class="chance__val" id="chance">0.0<i>%</i></div>
+          </div>
         </div>
 
         <div class="presets" id="presets" role="group" aria-label="Желаемый шанс"></div>
@@ -221,8 +216,8 @@
 
 <div class="toasts" id="toasts"></div>
 
-<script src="assets/js/data.js?v=16"></script>
-<script src="assets/js/weapons.js?v=16"></script>
-<script src="assets/js/app.js?v=16"></script>
+<script src="assets/js/data.js?v=17"></script>
+<script src="assets/js/weapons.js?v=17"></script>
+<script src="assets/js/app.js?v=17"></script>
 </body>
 </html>
