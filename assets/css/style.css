@@ -150,10 +150,6 @@ main,.hdr,.foot{position:relative;z-index:1}
 }
 .avatar:hover{box-shadow:0 0 0 2px rgba(32,230,255,.35);transform:translateY(-1px)}
 .avatar.is-active{box-shadow:0 0 0 2px var(--cyan)}
-.burger{display:none;width:40px;height:38px;flex:none;border:1px solid var(--line-2);
-  background:var(--panel);border-radius:10px;cursor:pointer;padding:0;place-items:center}
-.burger span{display:block;width:16px;height:1.5px;background:var(--txt);margin:3px auto}
-
 /* ---------- кнопки ---------- */
 .btn{
   border:1px solid var(--line-2);background:rgba(255,255,255,.045);color:var(--txt);
@@ -691,10 +687,16 @@ html.ptr-anim .promo,html.ptr-anim .hdr,html.ptr-anim main,html.ptr-anim .foot{t
 
 /* ================= АДАПТИВ ================= */
 @media (max-width:1180px){
-  .nav{display:none;position:absolute;top:74px;left:0;right:0;flex-direction:column;gap:2px;
-    background:var(--deep);border-bottom:1px solid var(--line);padding:10px 16px;margin:0}
-  .nav.is-open{display:flex}
-  .burger{display:grid}
+  .hdr__in{flex-wrap:wrap;height:auto;padding:11px 0 0;gap:12px}
+  .nav{
+    order:3;width:100%;margin:0;gap:2px;
+    overflow-x:auto;scrollbar-width:none;
+    border-top:1px solid var(--line);padding:4px 0 2px;
+  }
+  .nav::-webkit-scrollbar{display:none}
+  .nav a{flex:none;padding:11px 12px}
+  .nav a.is-active::after{left:12px;right:12px;bottom:4px}
+  .hdr__right{margin-left:auto}
   .split{grid-template-columns:1fr}
   .foot__in{grid-template-columns:1fr 1fr}
 }
@@ -711,11 +713,10 @@ html.ptr-anim .promo,html.ptr-anim .hdr,html.ptr-anim main,html.ptr-anim .foot{t
 @media (max-width:640px){
   .wrap{width:min(1320px,100% - 24px)}
   .sec{padding:52px 0}
-  .hdr__in{height:64px;gap:8px}
+  .hdr__in{gap:8px;padding-top:10px}
   .brand__txt{display:none}
   .lvl{display:none}
-  [data-deposit]{padding:10px 12px;font-size:0}
-  [data-deposit]::before{content:'+';font:800 18px/1 var(--mono)}
+  [data-deposit]{padding:10px 13px;letter-spacing:.06em}
   .bal{padding:8px 11px}
   .bal b{font-size:13.5px}
   .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}

@@ -607,9 +607,6 @@ function bind() {
     toast(`Хранилище продано за ${money(sum)}`, 'ok');
   });
 
-  on('#burger', 'click', () => $('#nav').classList.toggle('is-open'));
-  $$('#nav a').forEach(a => a.addEventListener('click', () => $('#nav').classList.remove('is-open')));
-
   document.addEventListener('keydown', e => {
     if (e.key !== 'Escape') return;
     closeModal();
