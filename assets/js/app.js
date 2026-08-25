@@ -7,13 +7,8 @@ const MIN_CHANCE = 0.01;
 const START_BALANCE = 10000;      // 100.00 (цены хранятся в центах)
 const STORE_KEY = 'neonforge.demo.v3';
 
-const PHASES = [
-  { id: 'scanning',    ms: 800,  state: 'проверка' },
-  { id: 'calculating', ms: 800,  state: 'расчёт' },
-  { id: 'forging',     ms: 1500, state: 'запуск' },
-  { id: 'resonance',   ms: 1000, state: 'финиш' },
-];
-const SPIN_MS = PHASES[2].ms + PHASES[3].ms;
+const WARMUP_MS = 700;    // разгон колец перед стартом стрелки
+const SPIN_MS = 2600;     // сам прокрут
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
@@ -218,7 +213,6 @@ function renderForge() {
 
   const c = chance();
   $('#chance').innerHTML = `${(c * 100).toFixed(1)}<i>%</i>`;
-  $('#chance-scale').style.width = `${(c * 100).toFixed(1)}%`;
   $('#core-arc').style.strokeDasharray = `${(c * ARC_C).toFixed(2)} ${ARC_C.toFixed(2)}`;
 
   $('#meta-in').textContent = f ? money(f.price) : '—';
@@ -330,23 +324,17 @@ function forge() {
   const zone = c * 360;
   const angle = win ? rnd(4, Math.max(5, zone - 4)) : rnd(zone + 4, 356);
 
-  let t0 = 0;
-  PHASES.forEach(ph => {
-    setTimeout(() => {
-      $('#core-state').textContent = ph.state;
-      if (ph.id === 'forging') {
-        const m = $('#core-marker');
-        m.style.transition = 'none';
-        m.style.transform = 'rotate(0deg)';
-        void m.getBoundingClientRect();
-        m.style.transition = `transform ${SPIN_MS}ms cubic-bezier(.13,.71,.16,1)`;
-        m.style.transform = `rotate(${360 * 5 + angle}deg)`;
-      }
-    }, t0);
-    t0 += ph.ms;
-  });
+  // короткая раскрутка, затем стрелка едет к результату
+  setTimeout(() => {
+    const m = $('#core-marker');
+    m.style.transition = 'none';
+    m.style.transform = 'rotate(0deg)';
+    void m.getBoundingClientRect();
+    m.style.transition = `transform ${SPIN_MS}ms cubic-bezier(.13,.71,.16,1)`;
+    m.style.transform = `rotate(${360 * 5 + angle}deg)`;
+  }, WARMUP_MS);
 
-  setTimeout(() => settle(win, f, t, core), t0);
+  setTimeout(() => settle(win, f, t, core), WARMUP_MS + SPIN_MS);
 }
 
 function settle(win, f, t, core) {
@@ -364,7 +352,6 @@ function settle(win, f, t, core) {
 
   core.classList.remove('is-run');
   core.classList.add(win ? 'is-win' : 'is-fail');
-  $('#core-state').textContent = win ? 'успех' : 'мимо';
   win ? particles.burst() : particles.calm();
 
   pushRecent({ who: 'Вы', from: f, to: t, win });
