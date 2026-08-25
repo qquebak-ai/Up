@@ -3,60 +3,66 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>UPGRADER — апгрейд скинов CS2 | Демо-режим</title>
-<meta name="description" content="Апгрейдер скинов CS2: выберите свой предмет, укажите желаемый и крутите барабан. Демонстрационный проект на виртуальной валюте.">
-<meta name="theme-color" content="#0a0c13">
+<title>NEON FORGE — кузница скинов CS2</title>
+<meta name="description" content="NEON FORGE — технологическая кузница скинов CS2: загрузи предмет в ядро, выбери шанс и получи более редкий. Демонстрационный проект на виртуальном балансе.">
+<meta name="theme-color" content="#07090D">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css?v=9">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>⚡</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css?v=10">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>◈</text></svg>">
 </head>
-<body>
+<body id="top">
 
-<!-- ================= ОБНОВЛЕНИЕ ПОТЯГИВАНИЕМ ================= -->
+<div class="fx" aria-hidden="true">
+  <div class="fx__grid"></div>
+  <div class="fx__beam"></div>
+  <div class="fx__streak"></div>
+  <div class="fx__streak"></div>
+  <div class="fx__streak"></div>
+</div>
+
 <div class="ptr" id="ptr" aria-hidden="true">
-  <div class="ptr__circle">
-    <svg viewBox="0 0 24 24" class="ptr__arrow" aria-hidden="true">
-      <path d="M12 5v10M7.5 10.5 12 15l4.5-4.5"/>
-    </svg>
-    <svg viewBox="0 0 24 24" class="ptr__spin" aria-hidden="true">
-      <circle cx="12" cy="12" r="9" stroke-dasharray="40 17"/>
-    </svg>
+  <div class="ptr__c">
+    <svg viewBox="0 0 24 24" class="ptr__arrow"><path d="M12 5v10M7.5 10.5 12 15l4.5-4.5"/></svg>
+    <svg viewBox="0 0 24 24" class="ptr__spin"><circle cx="12" cy="12" r="9" stroke-dasharray="40 17"/></svg>
   </div>
 </div>
 
-<div class="promo">
-  <span class="dot"></span>
-  Демо-проект: баланс виртуальный, реальные ставки и вывод отсутствуют · 18+
-</div>
+<div class="promo">Demo build · виртуальный баланс · реальные ставки и вывод отсутствуют · 18+</div>
 
-<header class="header">
-  <div class="wrap header__in">
-    <a class="logo" href="#">
-      <span class="logo__mark">UP</span>
-      <span class="logo__text">UPGRADER<em>.pro</em></span>
+<header class="hdr">
+  <div class="wrap hdr__in">
+    <a class="brand" href="index.html">
+      <span class="brand__mark">
+        <svg viewBox="0 0 24 24"><path d="M12 2 20 8v8l-8 6-8-6V8z"/><path d="M12 8l4 3v2l-4 3-4-3v-2z"/></svg>
+      </span>
+      <span class="brand__txt"><b>NEON FORGE</b><span>upgrade protocol</span></span>
     </a>
 
     <nav class="nav" id="nav">
-      <a href="#upgrade" class="is-active">Апгрейд</a>
-      <a href="shop.html">Магазин</a>
-      <a href="#inventory">Инвентарь</a>
-      <a href="#how">Как играть</a>
-      <a href="#faq">FAQ</a>
+      <a href="#forge" class="is-active">FORGE</a>
+      <a href="#battles">BATTLES</a>
+      <a href="#contracts" data-soon>CONTRACTS</a>
+      <a href="#inventory">INVENTORY</a>
+      <a href="market.html">MARKET</a>
     </nav>
 
-    <div class="header__right">
-      <div class="balance" title="Баланс демо-счёта">
-        <svg viewBox="0 0 24 24" class="coin" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h5M9.5 14.5h5" fill="none" stroke="#0a0c13" stroke-width="1.8" stroke-linecap="round"/></svg>
-        <span id="balance">0</span>
+    <div class="hdr__right">
+      <div class="lvl" title="Уровень кузницы растёт с каждым запуском ядра">
+        <div class="lvl__row"><b>FORGE LVL <i id="lvl-num" style="font-style:normal">1</i></b><span id="lvl-xp">0/4</span></div>
+        <div class="lvl__bar"><i class="lvl__fill" id="lvl-fill"></i></div>
       </div>
-      <button class="btn btn--ghost" id="topup" aria-label="Пополнить баланс">Пополнить</button>
-      <button class="btn btn--primary" id="login">Войти через Steam</button>
+      <div class="bal" title="Демо-баланс">
+        <svg viewBox="0 0 24 24"><path d="M12 3v18M8 7h6a3 3 0 0 1 0 6H9a3 3 0 0 0 0 6h7"/></svg>
+        <b id="balance">$0.00</b>
+      </div>
+      <button class="btn btn--key" id="deposit" aria-label="Пополнить демо-баланс">DEPOSIT</button>
+      <span class="avatar" aria-hidden="true">QQ</span>
       <button class="burger" id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
     </div>
   </div>
@@ -64,291 +70,326 @@
 
 <main>
 
-<!-- ================= UPGRADER ================= -->
-<section class="section section--hero" id="upgrade">
-  <div class="glow glow--a"></div>
-  <div class="glow glow--b"></div>
-
+<!-- ==================== FORGE ==================== -->
+<section class="forge" id="forge">
   <div class="wrap">
-    <div class="hero__head">
-      <h1>Апгрейд скинов <span>CS2</span></h1>
-      <p>Обменяй недорогой предмет на дорогой. Выбери желаемый шанс — чем он ниже, тем дороже предмет на выходе. Всё честно и прозрачно.</p>
-      <ul class="stats">
-        <li><b id="stat-online">0</b><span>игроков онлайн</span></li>
-        <li><b id="stat-upg">0</b><span>апгрейдов за сутки</span></li>
-        <li><b>92<i>%</i></b><span>возврат по шансу</span></li>
-      </ul>
+    <div class="forge__top">
+      <div>
+        <div class="tag tag--cyan">01 / FORGE CORE</div>
+        <h1 style="margin-top:12px">Кузница <em>NEON FORGE</em></h1>
+        <p>Загрузите предмет в ядро, задайте желаемый шанс — и реактор попробует пересобрать его в более редкий. Каждый запуск считается по открытой формуле.</p>
+      </div>
+      <span class="sec__idx" style="margin-left:auto">CORE ONLINE</span>
     </div>
 
-    <div class="upgrader">
-      <div class="upgrader__grid">
+    <div class="rig">
+      <div class="stage">
 
-        <!-- Барабан -->
-        <div class="wheel">
-          <svg viewBox="0 0 240 240" class="wheel__svg" aria-hidden="true">
+        <div class="chance">
+          <div class="chance__val" id="chance">0.0<i>%</i></div>
+          <div class="tag chance__lbl" id="chance-label">SUCCESS PROBABILITY</div>
+          <div class="chance__scale"><i id="chance-scale"></i></div>
+        </div>
+
+        <div class="bay bay--in" id="bay-from">
+          <div class="bay__hd"><span class="tag">INPUT / ВАШ ПРЕДМЕТ</span><span class="tag tag--cyan">A</span></div>
+          <div class="bay__body" id="from-body"></div>
+          <button class="bay__act" data-open="from">SELECT FROM INVENTORY</button>
+        </div>
+
+        <div class="core" id="core">
+          <canvas class="core__canvas" id="core-canvas" aria-hidden="true"></canvas>
+          <svg class="core__svg" viewBox="0 0 260 260" aria-hidden="true">
             <defs>
-              <linearGradient id="zoneGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#2ee6a8"/>
-                <stop offset="55%" stop-color="#35e0d0"/>
-                <stop offset="100%" stop-color="#7b5cfa"/>
+              <linearGradient id="arcGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#20E6FF"/>
+                <stop offset="60%" stop-color="#5CF0E0"/>
+                <stop offset="100%" stop-color="#B8FF3D"/>
               </linearGradient>
-              <linearGradient id="needleGrad" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0%" stop-color="#6f7690"/>
-                <stop offset="55%" stop-color="#e9ecf7"/>
-                <stop offset="100%" stop-color="#ffffff"/>
-              </linearGradient>
-              <radialGradient id="hubGrad" cx="50%" cy="38%" r="72%">
-                <stop offset="0%" stop-color="#1b2030"/>
-                <stop offset="100%" stop-color="#0a0c13"/>
-              </radialGradient>
-              <filter id="zoneGlow" x="-30%" y="-30%" width="160%" height="160%">
-                <feGaussianBlur stdDeviation="3.4" result="b"/>
+              <filter id="arcGlow" x="-40%" y="-40%" width="180%" height="180%">
+                <feGaussianBlur stdDeviation="3.2" result="b"/>
                 <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
               </filter>
             </defs>
 
-            <circle class="wheel__bezel" cx="120" cy="120" r="116"/>
-            <g class="wheel__ticks" id="wheel-ticks"></g>
-            <circle class="wheel__track" cx="120" cy="120" r="96"/>
-            <circle class="wheel__zone" id="wheel-zone" cx="120" cy="120" r="96" filter="url(#zoneGlow)"/>
-            <circle class="wheel__flash" id="wheel-flash" cx="120" cy="120" r="96"/>
-            <circle class="wheel__hub" cx="120" cy="120" r="70"/>
-            <circle class="wheel__hubline" cx="120" cy="120" r="70"/>
-
-            <g class="wheel__needle" id="wheel-needle">
-              <path class="needle__blade" d="M222 120 L188 110.5 L181 120 L188 129.5 Z"/>
-              <path class="needle__glint" d="M222 120 L188 110.5 L188 120 Z"/>
+            <circle class="core__ring" cx="130" cy="130" r="126"/>
+            <g class="core__spin-a">
+              <circle class="core__ring" cx="130" cy="130" r="114" stroke-dasharray="26 14" stroke="rgba(32,230,255,.22)"/>
+            </g>
+            <g class="core__ticks" id="core-ticks"></g>
+            <g transform="rotate(-90 130 130)">
+              <circle class="core__ring" cx="130" cy="130" r="88" stroke-width="7" stroke="rgba(255,255,255,.05)"/>
+              <circle class="core__arc" id="core-arc" cx="130" cy="130" r="88"/>
+              <g class="core__marker" id="core-marker">
+                <path d="M224 130 L200 123 L195 130 L200 137 Z"/>
+              </g>
+            </g>
+            <g class="core__spin-b">
+              <circle class="core__ring" cx="130" cy="130" r="66" stroke-dasharray="4 12" stroke="rgba(184,255,61,.25)"/>
             </g>
           </svg>
-          <div class="wheel__center">
-            <div class="wheel__chance" id="chance">0.00<i>%</i></div>
-            <div class="wheel__hint" id="wheel-hint">шанс апгрейда</div>
-          </div>
+          <div class="core__pulse"></div>
+          <div class="core__heart"><b id="core-state">STANDBY</b></div>
         </div>
 
-        <!-- Желаемый шанс -->
-        <div class="chances" id="chances" role="group" aria-label="Желаемый шанс апгрейда"></div>
-
-        <!-- Предметы в одну строку -->
-        <div class="slots">
-          <div class="slot" id="slot-from">
-            <div class="slot__label">Ваш предмет</div>
-            <div class="slot__body" id="from-body">
-              <button class="slot__empty" data-open="from">
-                <span class="plus">+</span>
-                Выбрать из инвентаря
-              </button>
-            </div>
-            <button class="slot__action" data-open="from">Изменить</button>
-          </div>
-
-          <div class="slots__arrow" aria-hidden="true">
-            <svg viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6"/></svg>
-          </div>
-
-          <div class="slot" id="slot-to">
-            <div class="slot__label">Получите</div>
-            <div class="slot__body" id="to-body">
-              <button class="slot__empty" data-open="to">
-                <span class="plus">+</span>
-                Выбрать из магазина
-              </button>
-            </div>
-            <button class="slot__action" data-open="to">Изменить</button>
-          </div>
+        <div class="bay bay--out" id="bay-to">
+          <div class="bay__hd"><span class="tag">OUTPUT / ПОЛУЧИТЕ</span><span class="tag tag--lime">B</span></div>
+          <div class="bay__body" id="to-body"></div>
+          <button class="bay__act" data-open="to">SELECT FROM MARKET</button>
         </div>
       </div>
 
-      <div class="upgrader__controls">
-        <button class="btn btn--go" id="go" disabled>Выберите предметы</button>
-        <div class="upgrader__meta">
-          <span>Ставка: <b id="meta-bet">—</b></span>
-          <span>Выигрыш: <b id="meta-win">—</b></span>
+      <div class="ctl">
+        <ul class="phases" id="phases">
+          <li data-p="scanning">SCANNING</li>
+          <li data-p="calculating">CALCULATING</li>
+          <li data-p="forging">FORGING</li>
+          <li data-p="resonance">RESONANCE</li>
+          <li data-p="result">RESULT</li>
+        </ul>
+
+        <div class="presets" id="presets" role="group" aria-label="Желаемый шанс"></div>
+
+        <button class="forge-btn" id="forge-btn" disabled>
+          <span class="forge-btn__body">
+            <span class="forge-btn__charge"></span>
+            <b id="forge-label">FORGE</b>
+            <span id="forge-sub">LOAD AN ITEM TO BEGIN</span>
+          </span>
+          <i class="forge-btn__spark"></i><i class="forge-btn__spark"></i><i class="forge-btn__spark"></i>
+        </button>
+
+        <div class="ctl__meta">
+          <span>INPUT <b id="meta-in">—</b></span>
+          <span>OUTPUT <b id="meta-out">—</b></span>
+          <span>EDGE <b>8%</b></span>
         </div>
       </div>
-    </div>
-
-    <!-- Лента -->
-    <div class="feed">
-      <div class="feed__head">
-        <span class="live"><i></i>Live</span> последние апгрейды
-      </div>
-      <div class="feed__row" id="feed"></div>
     </div>
   </div>
 </section>
 
-<!-- ================= ПЕРЕХОД В МАГАЗИН ================= -->
-<section class="section shopcta">
+<!-- ==================== RECENT + LIVE ==================== -->
+<section class="sec" id="recent-sec">
   <div class="wrap">
-    <a class="shopcta__box" href="shop.html">
+    <div class="split">
       <div>
-        <h2>Магазин предметов</h2>
-        <p>24 настоящих скина CS2 с ценами и картинками с площадки Steam — от P250 за копейки до керамбита. Купите предмет или выберите цель апгрейда.</p>
+        <div class="sec__head">
+          <div>
+            <div class="tag tag--cyan">02 / TELEMETRY</div>
+            <h2 style="margin-top:10px">Recent Upgrades</h2>
+            <p>Последние запуски ядра — свои и чужие.</p>
+          </div>
+        </div>
+        <div class="rail" id="recent"></div>
       </div>
-      <span class="shopcta__go">Открыть магазин →</span>
-    </a>
+
+      <aside class="live">
+        <div class="live__hd"><span class="live__dot"></span><span class="tag tag--lime">LIVE ACTIVITY</span></div>
+        <div class="live__list" id="live-list"></div>
+      </aside>
+    </div>
   </div>
 </section>
 
-<!-- ================= ИНВЕНТАРЬ ================= -->
-<section class="section section--alt" id="inventory">
+<!-- ==================== POPULAR ==================== -->
+<section class="sec" id="popular-sec">
   <div class="wrap">
-    <div class="section__head">
-      <h2>Мой инвентарь <span class="count" id="inv-count">0</span></h2>
-      <div class="section__head-right">
-        <span class="inv-sum">Оценка: <b id="inv-sum">0</b></span>
-        <button class="btn btn--ghost" id="sell-all">Продать всё</button>
+    <div class="sec__head">
+      <div>
+        <div class="tag tag--cyan">03 / ARSENAL</div>
+        <h2 style="margin-top:10px">Popular Skins</h2>
+        <p>Самые дорогие артефакты каталога. Клик ставит предмет целью апгрейда.</p>
       </div>
+      <a class="btn" href="market.html">OPEN MARKET →</a>
+    </div>
+    <div class="grid" id="popular"></div>
+  </div>
+</section>
+
+<!-- ==================== BATTLES ==================== -->
+<section class="sec" id="battles">
+  <div class="wrap">
+    <div class="sec__head">
+      <div>
+        <div class="tag tag--cyan">04 / PVP</div>
+        <h2 style="margin-top:10px">Battles</h2>
+        <p>Режимы, где ядро работает сразу на нескольких операторов.</p>
+      </div>
+    </div>
+    <div class="modes">
+      <article class="mode">
+        <div class="mode__ico"><svg viewBox="0 0 24 24"><path d="M4 20 20 4M8 4H4v4M16 20h4v-4"/></svg></div>
+        <h3>Duel Forge</h3>
+        <p>Двое загружают предметы равной цены. Ядро выбирает одного — он забирает оба.</p>
+        <div class="mode__foot"><span class="mode__pill">1 V 1</span><span class="tag tag--lime">OPEN</span></div>
+      </article>
+      <article class="mode">
+        <div class="mode__ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4v16M4 12h16"/></svg></div>
+        <h3>Core Roulette</h3>
+        <p>До шести операторов на одно ядро. Чем дороже вклад, тем шире сектор.</p>
+        <div class="mode__foot"><span class="mode__pill">2 – 6</span><span class="tag tag--lime">OPEN</span></div>
+      </article>
+      <article class="mode mode--soon">
+        <div class="mode__ico"><svg viewBox="0 0 24 24"><path d="M12 3l7 4v10l-7 4-7-4V7z"/><path d="M12 12v9M12 12 5 7M12 12l7-5"/></svg></div>
+        <h3>Cascade</h3>
+        <p>Серия из пяти апгрейдов подряд: каждый выигрыш автоматически идёт в следующий запуск.</p>
+        <div class="mode__foot"><span class="mode__pill">SOLO</span><span class="tag">SOON</span></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== CONTRACTS ==================== -->
+<section class="sec" id="contracts">
+  <div class="wrap">
+    <div class="sec__head">
+      <div>
+        <div class="tag tag--cyan">05 / CONTRACTS</div>
+        <h2 style="margin-top:10px">Contracts</h2>
+        <p>Сборка десяти предметов одного класса в один следующего уровня.</p>
+      </div>
+    </div>
+    <div class="modes">
+      <article class="mode mode--soon">
+        <div class="mode__ico"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7"/></svg></div>
+        <h3>Trade-Up Protocol</h3>
+        <p>10 × STANDARD → 1 × ENHANCED. Класс результата фиксирован, конкретный предмет — нет.</p>
+        <div class="mode__foot"><span class="mode__pill">10 → 1</span><span class="tag">SOON</span></div>
+      </article>
+      <article class="mode mode--soon">
+        <div class="mode__ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+        <h3>Daily Directive</h3>
+        <p>Ежедневное задание ядра: провести серию запусков и получить бонус к балансу.</p>
+        <div class="mode__foot"><span class="mode__pill">24 H</span><span class="tag">SOON</span></div>
+      </article>
+      <article class="mode mode--soon">
+        <div class="mode__ico"><svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.6L21 9.5l-4.5 4.3 1.1 6.2L12 17l-5.6 3 1.1-6.2L3 9.5l6.4-.9z"/></svg></div>
+        <h3>Prestige Reset</h3>
+        <p>Обнуление Forge Level в обмен на постоянный бонус к шансу. Требует уровня 30.</p>
+        <div class="mode__foot"><span class="mode__pill">LVL 30</span><span class="tag">SOON</span></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== INVENTORY ==================== -->
+<section class="sec" id="inventory">
+  <div class="wrap">
+    <div class="sec__head">
+      <div>
+        <div class="tag tag--cyan">06 / STORAGE</div>
+        <h2 style="margin-top:10px">Inventory <span id="inv-count" style="color:var(--cyan)">0</span></h2>
+        <p>Оценка склада: <b id="inv-sum" style="color:var(--lime);font-family:var(--mono)">$0.00</b></p>
+      </div>
+      <button class="btn" id="sell-all">LIQUIDATE ALL</button>
     </div>
     <div class="grid" id="inv-grid"></div>
   </div>
 </section>
 
-<!-- ================= КАК ИГРАТЬ ================= -->
-<section class="section" id="how">
+<!-- ==================== PROTOCOL ==================== -->
+<section class="sec" id="protocol">
   <div class="wrap">
-    <div class="section__head"><h2>Как это работает</h2></div>
-    <div class="steps">
-      <article class="step">
-        <div class="step__n">01</div>
-        <h3>Выберите свой предмет</h3>
-        <p>Возьмите скин из инвентаря или пополните демо-баланс и купите новый в магазине. Цены — реальные, с торговой площадки Steam.</p>
-      </article>
-      <article class="step">
-        <div class="step__n">02</div>
-        <h3>Укажите цель</h3>
-        <p>Нажмите 75%, 50% или 35% — под выбранный шанс подберётся предмет подходящей цены. Любую другую цель можно взять в магазине.</p>
-      </article>
-      <article class="step">
-        <div class="step__n">03</div>
-        <h3>Крутите барабан</h3>
-        <p>Стрелка останавливается в зелёной зоне — предмет ваш. Иначе ставка сгорает.</p>
-      </article>
-      <article class="step">
-        <div class="step__n">04</div>
-        <h3>Забирайте результат</h3>
-        <p>Выигранный скин попадает в инвентарь: используйте его в следующем апгрейде или продайте.</p>
-      </article>
+    <div class="sec__head">
+      <div>
+        <div class="tag tag--cyan">07 / PROTOCOL</div>
+        <h2 style="margin-top:10px">Как считает ядро</h2>
+      </div>
     </div>
-
-    <div class="fair">
-      <h3>Формула шанса</h3>
-      <p>Шанс рассчитывается как отношение стоимости вашего предмета к стоимости желаемого с учётом комиссии площадки:</p>
-      <code>шанс = (цена вашего предмета / цена желаемого) × 0.92</code>
-      <p class="fair__note">Максимальный шанс ограничен 92%, минимальный — 1%. Результат определяется псевдослучайным числом в момент запуска барабана.</p>
+    <div class="proto">
+      <div class="proto__b"><div class="tag tag--cyan">STEP 01</div><h3>Загрузка</h3><p>Предмет из инвентаря отправляется в приёмник A. Его цена — ставка запуска.</p></div>
+      <div class="proto__b"><div class="tag tag--cyan">STEP 02</div><h3>Цель</h3><p>Пресет шанса подбирает предмет нужной цены, либо цель выбирается вручную в маркете.</p></div>
+      <div class="proto__b"><div class="tag tag--cyan">STEP 03</div><h3>Запуск</h3><p>Ядро проходит фазы SCANNING → CALCULATING → FORGING → RESONANCE и фиксирует результат.</p></div>
+      <div class="proto__b"><div class="tag tag--cyan">STEP 04</div><h3>Исход</h3><p>Успех — предмет собирается в приёмнике B. Провал — ядро схлопывается, ставка сгорает.</p></div>
     </div>
-  </div>
-</section>
-
-<!-- ================= FAQ ================= -->
-<section class="section section--alt" id="faq">
-  <div class="wrap wrap--narrow">
-    <div class="section__head"><h2>Частые вопросы</h2></div>
-    <div class="faq" id="faq-list">
-      <details open>
-        <summary>Здесь можно выиграть настоящие деньги?</summary>
-        <p>Нет. Это демонстрационный проект: баланс виртуальный и хранится только в вашем браузере. Ни пополнения, ни вывода не существует. Настоящие здесь лишь картинки и цены предметов — они взяты с витрины торговой площадки Steam на момент сборки каталога.</p>
-      </details>
-      <details>
-        <summary>Почему шанс меньше, чем отношение цен?</summary>
-        <p>Из шанса вычитается комиссия площадки — 8%. Это стандартная механика подобных сервисов, и она заложена в формулу открыто.</p>
-      </details>
-      <details>
-        <summary>Что будет с предметом при проигрыше?</summary>
-        <p>Он списывается из инвентаря. При выигрыше вместо него появляется выбранный скин.</p>
-      </details>
-      <details>
-        <summary>Как сбросить прогресс?</summary>
-        <p>Нажмите «Пополнить» — на баланс добавится стартовая сумма. Полный сброс — очистка данных сайта в браузере.</p>
-      </details>
-      <details>
-        <summary>Игра затягивает — что делать?</summary>
-        <p>Помните, что механика апгрейда математически убыточна: ожидаемая отдача 92%. Делайте перерывы, а при реальных проблемах с азартными играми обратитесь за помощью к специалистам.</p>
-      </details>
+    <div class="formula">
+      <div class="tag tag--lime">PROBABILITY FORMULA</div>
+      <code>chance = (цена входа / цена цели) × 0.92 · предел 1…92%</code>
+      <p>Комиссия площадки — 8%, она заложена в формулу открыто. Исход определяется псевдослучайным числом в момент запуска: ожидаемая отдача 92% означает, что механика убыточна на дистанции.</p>
     </div>
   </div>
 </section>
 
 </main>
 
-<footer class="footer">
-  <div class="wrap footer__in">
-    <div class="footer__col">
-      <a class="logo" href="#">
-        <span class="logo__mark">UP</span>
-        <span class="logo__text">UPGRADER<em>.pro</em></span>
+<footer class="foot">
+  <div class="wrap foot__in">
+    <div class="foot__c">
+      <a class="brand" href="index.html">
+        <span class="brand__mark"><svg viewBox="0 0 24 24"><path d="M12 2 20 8v8l-8 6-8-6V8z"/><path d="M12 8l4 3v2l-4 3-4-3v-2z"/></svg></span>
+        <span class="brand__txt"><b>NEON FORGE</b><span>upgrade protocol</span></span>
       </a>
-      <p>Учебный клон интерфейса апгрейдера скинов. Изображения и цены предметов — с витрины Steam Community Market. Проект не связан с Valve Corporation и не является азартной игрой на деньги.</p>
+      <p>Демонстрационный интерфейс кузницы скинов. Названия, цены и изображения предметов — с витрины Steam Community Market и принадлежат Valve Corporation. Проект с ней не связан и не является азартной игрой на деньги.</p>
     </div>
-    <div class="footer__col">
-      <h4>Разделы</h4>
-      <a href="#upgrade">Апгрейд</a>
-      <a href="shop.html">Магазин</a>
-      <a href="#inventory">Инвентарь</a>
-      <a href="#faq">FAQ</a>
+    <div class="foot__c">
+      <h4 class="tag">SECTIONS</h4>
+      <a href="#forge">Forge</a><a href="#battles">Battles</a><a href="#inventory">Inventory</a><a href="market.html">Market</a>
     </div>
-    <div class="footer__col">
-      <h4>Документы</h4>
-      <a href="#faq">Пользовательское соглашение</a>
-      <a href="#faq">Политика конфиденциальности</a>
-      <a href="#how">Честная игра</a>
+    <div class="foot__c">
+      <h4 class="tag">PROTOCOL</h4>
+      <a href="#protocol">Формула шанса</a><a href="#protocol">Фазы запуска</a><a href="#contracts">Контракты</a>
     </div>
-    <div class="footer__col">
-      <h4>Ответственная игра</h4>
-      <p>Сервис доступен только совершеннолетним. Играйте с умом и не пытайтесь отыграться.</p>
+    <div class="foot__c">
+      <h4 class="tag">RESPONSIBLE PLAY</h4>
+      <p>Сервис для совершеннолетних. Ожидаемая отдача 92% — играйте с холодной головой и не пытайтесь отыграться.</p>
       <span class="age">18+</span>
     </div>
   </div>
-  <div class="wrap footer__bottom">
-    <span>© <span id="year"></span> UPGRADER — демонстрационный проект</span>
-    <span>Counter-Strike и скины — торговые марки Valve Corporation</span>
+  <div class="wrap foot__bot">
+    <span>© <span id="year"></span> NEON FORGE — demo build</span>
+    <span>Counter-Strike 2 и скины — торговые марки Valve Corporation</span>
   </div>
 </footer>
 
-<!-- ================= МОДАЛКА ВЫБОРА ================= -->
+<nav class="tabbar" aria-label="Основная навигация">
+  <a href="#top"><svg viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v9H4z"/></svg>HOME</a>
+  <a href="#forge" class="is-active"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><path d="M12 5v14"/></svg>FORGE</a>
+  <a href="#battles"><svg viewBox="0 0 24 24"><path d="M4 20 20 4M8 4H4v4M16 20h4v-4"/></svg>BATTLES</a>
+  <a href="#inventory"><svg viewBox="0 0 24 24"><path d="M4 8h16v12H4z"/><path d="M9 8V5h6v3"/></svg>STORAGE</a>
+</nav>
+
 <div class="modal" id="modal" hidden>
-  <div class="modal__backdrop" data-close></div>
+  <div class="modal__bg" data-close></div>
   <div class="modal__box" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <div class="modal__head">
-      <h3 id="modal-title">Выбор предмета</h3>
-      <button class="modal__close" data-close aria-label="Закрыть">×</button>
+    <div class="modal__hd">
+      <h3 id="modal-title">SELECT UNIT</h3>
+      <button class="modal__x" data-close aria-label="Закрыть">×</button>
     </div>
-    <input type="search" class="modal__search" id="modal-search" placeholder="Поиск предмета…">
+    <input type="search" class="modal__q" id="modal-search" placeholder="поиск: AWP, Karambit, Redline…">
     <div class="grid grid--modal" id="modal-grid"></div>
-    <p class="modal__empty" id="modal-empty" hidden>Ничего не найдено.</p>
+    <p class="modal__none" id="modal-empty" hidden>NOTHING FOUND</p>
   </div>
 </div>
 
-<!-- ================= РЕЗУЛЬТАТ ================= -->
 <div class="result" id="result" hidden>
   <div class="result__box">
-    <div class="result__title" id="result-title"></div>
+    <div class="result__st" id="result-st"></div>
+    <div class="result__t" id="result-title"></div>
     <div class="result__card" id="result-card"></div>
-    <div class="result__actions">
-      <button class="btn btn--ghost" id="result-sell">Продать</button>
-      <button class="btn btn--primary" id="result-keep">В инвентарь</button>
+    <div class="result__acts">
+      <button class="btn" id="result-sell">LIQUIDATE</button>
+      <button class="btn btn--key" id="result-keep">TO STORAGE</button>
     </div>
   </div>
 </div>
 
-<!-- ================= ТОЛЬКО ПОРТРЕТ ================= -->
 <div class="rotate" id="rotate" aria-hidden="true">
   <div class="rotate__box">
-    <svg viewBox="0 0 64 64" class="rotate__icon" aria-hidden="true">
+    <svg viewBox="0 0 64 64" class="rotate__icon">
       <rect x="20" y="6" width="24" height="42" rx="4"/>
       <path d="M14 52a20 20 0 0 0 36 0" fill="none" stroke-linecap="round"/>
       <path d="M50 46v8h-8"/>
     </svg>
-    <div class="rotate__title">Поверните телефон</div>
-    <p>Сайт рассчитан на вертикальную ориентацию экрана.</p>
+    <div class="rotate__t">Поверните телефон</div>
+    <p>Интерфейс ядра рассчитан на вертикальную ориентацию экрана.</p>
   </div>
 </div>
 
 <div class="toasts" id="toasts"></div>
 
-<script src="assets/js/data.js?v=9"></script>
-<script src="assets/js/weapons.js?v=9"></script>
-<script src="assets/js/app.js?v=9"></script>
+<script src="assets/js/data.js?v=10"></script>
+<script src="assets/js/weapons.js?v=10"></script>
+<script src="assets/js/app.js?v=10"></script>
 </body>
 </html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>MARKET — NEON FORGE</title>
+<meta name="description" content="Маркет NEON FORGE: настоящие предметы CS2 с ценами и изображениями с площадки Steam. Демонстрационный проект на виртуальном балансе.">
+<meta name="theme-color" content="#07090D">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css?v=10">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>◈</text></svg>">
+</head>
+<body id="top">
+
+<div class="fx" aria-hidden="true">
+  <div class="fx__grid"></div>
+  <div class="fx__beam"></div>
+  <div class="fx__streak"></div>
+  <div class="fx__streak"></div>
+  <div class="fx__streak"></div>
+</div>
+
+<div class="ptr" id="ptr" aria-hidden="true">
+  <div class="ptr__c">
+    <svg viewBox="0 0 24 24" class="ptr__arrow"><path d="M12 5v10M7.5 10.5 12 15l4.5-4.5"/></svg>
+    <svg viewBox="0 0 24 24" class="ptr__spin"><circle cx="12" cy="12" r="9" stroke-dasharray="40 17"/></svg>
+  </div>
+</div>
+
+<div class="promo">Demo build · виртуальный баланс · реальные ставки и вывод отсутствуют · 18+</div>
+
+<header class="hdr">
+  <div class="wrap hdr__in">
+    <a class="brand" href="index.html">
+      <span class="brand__mark">
+        <svg viewBox="0 0 24 24"><path d="M12 2 20 8v8l-8 6-8-6V8z"/><path d="M12 8l4 3v2l-4 3-4-3v-2z"/></svg>
+      </span>
+      <span class="brand__txt"><b>NEON FORGE</b><span>upgrade protocol</span></span>
+    </a>
+
+    <nav class="nav" id="nav">
+      <a href="index.html#forge">FORGE</a>
+      <a href="index.html#battles">BATTLES</a>
+      <a href="index.html#contracts" data-soon>CONTRACTS</a>
+      <a href="index.html#inventory">INVENTORY</a>
+      <a href="market.html" class="is-active">MARKET</a>
+    </nav>
+
+    <div class="hdr__right">
+      <div class="lvl" title="Уровень кузницы растёт с каждым запуском ядра">
+        <div class="lvl__row"><b>FORGE LVL <i id="lvl-num" style="font-style:normal">1</i></b><span id="lvl-xp">0/4</span></div>
+        <div class="lvl__bar"><i class="lvl__fill" id="lvl-fill"></i></div>
+      </div>
+      <div class="bal" title="Демо-баланс">
+        <svg viewBox="0 0 24 24"><path d="M12 3v18M8 7h6a3 3 0 0 1 0 6H9a3 3 0 0 0 0 6h7"/></svg>
+        <b id="balance">$0.00</b>
+      </div>
+      <button class="btn btn--key" id="deposit" aria-label="Пополнить демо-баланс">DEPOSIT</button>
+      <span class="avatar" aria-hidden="true">QQ</span>
+      <button class="burger" id="burger" aria-label="Меню"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<section class="sec" id="market" style="padding-top:44px">
+  <div class="wrap">
+    <div class="market__head">
+      <div class="tag tag--cyan">ARSENAL / MARKET</div>
+      <h1>Маркет предметов</h1>
+      <p>Настоящие скины CS2: название, износ, класс редкости, цена и изображение — с витрины Steam Community Market. ACQUIRE забирает предмет на демо-баланс, клик по карточке ставит её целью ядра.</p>
+    </div>
+
+    <div class="filters">
+      <input type="search" id="search" placeholder="поиск: AWP, Karambit, Redline…" aria-label="Поиск">
+      <select id="sort" aria-label="Сортировка">
+        <option value="asc">СНАЧАЛА ДЕШЁВЫЕ</option>
+        <option value="desc">СНАЧАЛА ДОРОГИЕ</option>
+        <option value="name">ПО НАЗВАНИЮ</option>
+      </select>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="grid" id="shop-grid"></div>
+
+    <a class="back" href="index.html#forge">← ВЕРНУТЬСЯ К ЯДРУ</a>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap foot__in">
+    <div class="foot__c">
+      <a class="brand" href="index.html">
+        <span class="brand__mark"><svg viewBox="0 0 24 24"><path d="M12 2 20 8v8l-8 6-8-6V8z"/><path d="M12 8l4 3v2l-4 3-4-3v-2z"/></svg></span>
+        <span class="brand__txt"><b>NEON FORGE</b><span>upgrade protocol</span></span>
+      </a>
+      <p>Демонстрационный интерфейс кузницы скинов. Названия, цены и изображения предметов — с витрины Steam Community Market и принадлежат Valve Corporation. Проект с ней не связан и не является азартной игрой на деньги.</p>
+    </div>
+    <div class="foot__c">
+      <h4 class="tag">SECTIONS</h4>
+      <a href="index.html#forge">Forge</a><a href="index.html#battles">Battles</a><a href="index.html#inventory">Inventory</a><a href="market.html">Market</a>
+    </div>
+    <div class="foot__c">
+      <h4 class="tag">PROTOCOL</h4>
+      <a href="index.html#protocol">Формула шанса</a><a href="index.html#protocol">Фазы запуска</a><a href="index.html#contracts">Контракты</a>
+    </div>
+    <div class="foot__c">
+      <h4 class="tag">RESPONSIBLE PLAY</h4>
+      <p>Сервис для совершеннолетних. Ожидаемая отдача 92% — играйте с холодной головой и не пытайтесь отыграться.</p>
+      <span class="age">18+</span>
+    </div>
+  </div>
+  <div class="wrap foot__bot">
+    <span>© <span id="year"></span> NEON FORGE — demo build</span>
+    <span>Counter-Strike 2 и скины — торговые марки Valve Corporation</span>
+  </div>
+</footer>
+
+<nav class="tabbar" aria-label="Основная навигация">
+  <a href="index.html#top"><svg viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v9H4z"/></svg>HOME</a>
+  <a href="index.html#forge"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><path d="M12 5v14"/></svg>FORGE</a>
+  <a href="index.html#battles"><svg viewBox="0 0 24 24"><path d="M4 20 20 4M8 4H4v4M16 20h4v-4"/></svg>BATTLES</a>
+  <a href="index.html#inventory"><svg viewBox="0 0 24 24"><path d="M4 8h16v12H4z"/><path d="M9 8V5h6v3"/></svg>STORAGE</a>
+</nav>
+
+<div class="modal" id="modal" hidden>
+  <div class="modal__bg" data-close></div>
+  <div class="modal__box" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal__hd">
+      <h3 id="modal-title">SELECT UNIT</h3>
+      <button class="modal__x" data-close aria-label="Закрыть">×</button>
+    </div>
+    <input type="search" class="modal__q" id="modal-search" placeholder="поиск: AWP, Karambit, Redline…">
+    <div class="grid grid--modal" id="modal-grid"></div>
+    <p class="modal__none" id="modal-empty" hidden>NOTHING FOUND</p>
+  </div>
+</div>
+
+<div class="result" id="result" hidden>
+  <div class="result__box">
+    <div class="result__st" id="result-st"></div>
+    <div class="result__t" id="result-title"></div>
+    <div class="result__card" id="result-card"></div>
+    <div class="result__acts">
+      <button class="btn" id="result-sell">LIQUIDATE</button>
+      <button class="btn btn--key" id="result-keep">TO STORAGE</button>
+    </div>
+  </div>
+</div>
+
+<div class="rotate" id="rotate" aria-hidden="true">
+  <div class="rotate__box">
+    <svg viewBox="0 0 64 64" class="rotate__icon">
+      <rect x="20" y="6" width="24" height="42" rx="4"/>
+      <path d="M14 52a20 20 0 0 0 36 0" fill="none" stroke-linecap="round"/>
+      <path d="M50 46v8h-8"/>
+    </svg>
+    <div class="rotate__t">Поверните телефон</div>
+    <p>Интерфейс ядра рассчитан на вертикальную ориентацию экрана.</p>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script src="assets/js/data.js?v=10"></script>
+<script src="assets/js/weapons.js?v=10"></script>
+<script src="assets/js/app.js?v=10"></script>
+</body>
+</html>
